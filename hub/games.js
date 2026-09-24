@@ -49,4 +49,21 @@ const GAMES = [
     },
     skills: { en: "Coding · Logic", es: "Programación · Lógica" },
   },
+  {
+    id: "colors",
+    href: "games/colors/",
+    emoji: "🎨",
+    mascot: "pipo",
+    color: "#ff8c1a",
+    maxStars: 33,
+    title: {
+      en: (name) => `Color Lab with ${name}`,
+      es: (name) => `Laboratorio de colores con ${name}`,
+    },
+    about: {
+      en: "Learn colour names, mix paints and paint pictures!",
+      es: "¡Aprende los colores, mezcla pinturas y pinta dibujos!",
+    },
+    skills: { en: "Colours · Mixing", es: "Colores · Mezclas" },
+  },
 ];
