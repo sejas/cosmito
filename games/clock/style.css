@@ -1,0 +1,265 @@
+/* Tell the Time. Shared tokens and components come from shared/base.css. */
+:root {
+  --mc: #82c8ff; /* current mode colour */
+  --rim: #7b61ff;
+  --rim-dark: #5a43d6;
+  --face: #fffdf6;
+  --hour: #3b5bdb;
+  --minute: #ff6b9a;
+  --ghost: #22b573;
+}
+.treat { display: inline-block; width: 1em; height: 1em; line-height: 1; vertical-align: -0.12em; text-align: center; }
+img.treat { object-fit: contain; }
+
+/* ---------- header ---------- */
+.top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.logo { margin: 0; flex: 1; min-width: 200px; font-size: clamp(26px, 5.4vw, 42px); font-weight: 700; line-height: 1.05; }
+.logo span { display: inline-block; }
+.logo .l1 { color: var(--rim); transform: rotate(-3deg); }
+.logo .l2 { color: #fff; text-shadow: 0 2px 0 var(--ink-soft); font-size: 0.7em; }
+.logo .l3 { color: var(--accent); transform: rotate(3deg); }
+.settings { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings .chip { min-height: 44px; }
+
+/* ---------- home ---------- */
+#home { max-width: 1000px; margin: 0 auto; padding: 16px 16px 40px; gap: 16px; width: 100%; }
+.hero { display: flex; align-items: center; justify-content: center; gap: 16px 32px; flex-wrap: wrap; margin-top: 70px; }
+.mascot-wrap.big { width: 170px; height: 170px; flex: none; cursor: pointer; }
+.big .bubble { font-size: 19px; white-space: normal; width: max-content; max-width: 280px; left: 36%; bottom: 94%; }
+.total-card { padding: 14px 20px; min-width: 220px; text-align: center; }
+.total-label { font-weight: 600; color: var(--ink-soft); font-size: 15px; }
+.total-num { font-size: 30px; font-weight: 700; margin-bottom: 8px; }
+.total-bar { height: 14px; background: #eef1fb; border-radius: 99px; overflow: hidden; }
+.total-bar div { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 99px; transition: width 0.8s; }
+
+.pick { text-align: center; font-size: 26px; margin: 4px 0 0; }
+.levels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.level-card {
+  position: relative; border: 0; border-radius: 22px; background: #fff; padding: 10px 6px 8px; min-height: 96px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 6px 0 #cfd5ea; transition: transform 0.15s;
+}
+.level-card:hover { transform: translateY(-3px) rotate(-1deg); }
+.level-card:active { transform: translateY(3px); box-shadow: 0 2px 0 #cfd5ea; }
+.level-card .clock.mini { width: min(72px, 100%); height: auto; }
+.level-name { font-weight: 700; font-size: clamp(13px, 2.4vw, 18px); line-height: 1.1; text-align: center; }
+.level-stars { font-size: 13px; font-weight: 700; color: var(--gold-dark); }
+.level-card.sel { background: #f1edff; outline: 5px solid #fff; box-shadow: 0 6px 0 #cfd5ea, 0 0 0 9px var(--rim); transform: scale(1.04); }
+.level-card.bounce { animation: pop-sm 0.35s; }
+.crown { position: absolute; top: -14px; left: -6px; font-size: 26px; transform: rotate(-18deg); }
+
+.modes { padding: 16px; display: flex; flex-direction: column; gap: 12px; border-top: 10px solid var(--rim); }
+.modes-title { font-size: 22px; font-weight: 700; text-align: center; }
+.mode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.mode {
+  border: 0; border-radius: 20px; background: var(--mc); box-shadow: 0 5px 0 color-mix(in srgb, var(--mc) 60%, #26315c);
+  min-height: 132px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  transition: transform 0.15s;
+}
+.mode:hover { transform: translateY(-3px); }
+.mode:active { transform: translateY(4px); box-shadow: none; }
+.mode b { font-size: 22px; }
+.mode small { font-size: 14px; color: var(--ink); opacity: 0.75; line-height: 1.2; text-align: center; }
+.mode-emoji { font-size: 38px; line-height: 1.1; }
+.mode .stars { font-size: 20px; color: rgba(255, 255, 255, 0.8); }
+.explore-btn { align-self: center; min-height: 60px; display: inline-flex; align-items: center; gap: 8px; }
+
+/* ---------- the clock ---------- */
+.clock { display: block; overflow: visible; user-select: none; -webkit-user-select: none; }
+.c-rim { fill: var(--rim); }
+.c-face { fill: var(--face); }
+.c-face-ring { fill: none; stroke: #efe9ff; stroke-width: 6; }
+.c-tick { stroke: #b9bfd8; stroke-width: 1.4; stroke-linecap: round; }
+.c-tick.big { stroke: var(--ink); stroke-width: 3.2; }
+.c-num { font-family: var(--font); font-weight: 700; font-size: 22px; fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.c-min { font-family: var(--font); font-weight: 700; font-size: 9.5px; fill: #fff; text-anchor: middle; dominant-baseline: central; }
+.hand-body { stroke-linecap: round; }
+.hand-h .hand-body { stroke: var(--hour); stroke-width: 10; }
+.hand-m .hand-body { stroke: var(--minute); stroke-width: 6; }
+.hand-h .hand-knob { fill: var(--hour); stroke: #fff; stroke-width: 3; }
+.hand-m .hand-knob { fill: var(--minute); stroke: #fff; stroke-width: 3; }
+.hand-hit { stroke: transparent; stroke-width: 36; stroke-linecap: round; pointer-events: stroke; }
+.c-cap { fill: var(--ink); }
+.c-cap-dot { fill: #fff; }
+.hand { outline: none; }
+.clock.big { width: 100%; height: auto; }
+.clock.interactive { touch-action: none; cursor: pointer; }
+.clock.interactive .hand { cursor: grab; }
+.clock.dragging, .clock.dragging .hand { cursor: grabbing; }
+.clock.interactive .hand-knob { animation: knob 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.clock.dragging .hand-knob { animation: none; }
+@keyframes knob { 50% { transform: scale(1.25); } }
+.hand:focus-visible .hand-body { filter: drop-shadow(0 0 4px var(--accent)); }
+.hand:focus-visible .hand-knob { stroke: var(--ink); stroke-width: 4; }
+.drag-h .hand-h .hand-body, .drag-m .hand-m .hand-body { filter: drop-shadow(0 2px 3px rgba(38, 49, 92, 0.45)); }
+.ghost .hand-body { stroke: var(--ghost) !important; opacity: 0.55; }
+.ghost { animation: ghost 1s ease-in-out infinite; pointer-events: none; }
+@keyframes ghost { 50% { opacity: 0.35; } }
+.clock.mini .hand-h .hand-body { stroke-width: 13; }
+.clock.mini .hand-m .hand-body { stroke-width: 8; }
+.clock.mini .c-num { font-size: 26px; }
+.clock.mini .c-tick.big { stroke-width: 4; }
+
+/* ---------- play ---------- */
+#play { max-width: 1040px; margin: 0 auto; padding: 12px 16px 12px; gap: 10px; width: 100%; }
+.game-top { flex-wrap: nowrap; }
+.game-top .round-btn { width: 56px; height: 56px; }
+.game-title { flex: 1; min-width: 0; font-size: clamp(18px, 4.3vw, 26px); font-weight: 700; text-align: center; line-height: 1.1; overflow-wrap: anywhere; }
+
+.dots { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.dot { width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.6); display: grid; place-items: center; font-size: 15px; font-weight: 700; color: #fff; transition: transform 0.2s; }
+.dot.now { background: #fff; box-shadow: 0 0 0 3px var(--mc), 0 0 0 5px var(--ink); transform: scale(1.1); }
+.dot.good { background: var(--good); }
+.dot.fixed { background: var(--gold-dark); }
+.dot.retry { background: #ffc2c2; }
+.dot.scene-dot { width: 34px; height: 34px; font-size: 19px; filter: grayscale(0.7); opacity: 0.7; }
+.dot.scene-dot.now, .dot.scene-dot.good, .dot.scene-dot.fixed, .dot.scene-dot.retry { filter: none; opacity: 1; }
+
+.play-main { display: flex; flex-direction: column; gap: 12px; }
+.prompt { padding: 12px 14px; text-align: center; border-top: 8px solid var(--mc); }
+.prompt-q { font-size: clamp(19px, 4.6vw, 24px); font-weight: 600; color: var(--ink-soft); }
+.prompt-big { margin-top: 4px; font-size: clamp(28px, 7.6vw, 42px); font-weight: 700; line-height: 1.15; color: var(--ink); }
+.prompt-big.in { animation: pop-sm 0.35s; }
+.lcd {
+  display: inline-block; font-variant-numeric: tabular-nums; letter-spacing: 2px; background: #1f2a52; color: #7dffb8;
+  text-shadow: 0 0 10px rgba(125, 255, 184, 0.6); border-radius: 14px; padding: 2px 16px; font-weight: 700;
+}
+.prompt-big.lcd { font-size: clamp(48px, 14vw, 72px); padding: 4px 26px; margin-top: 8px; }
+
+.clock-area { display: flex; justify-content: center; }
+.clock-card { padding: 12px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: background 0.25s, box-shadow 0.25s; }
+.clock-card.good { background: #eafff2; }
+.clock-card.oops { background: #fff8e6; }
+.clock-holder { width: min(100%, 50vh, 440px); aspect-ratio: 1; }
+.readout { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.readout .lcd { font-size: 40px; }
+.read-words { font-size: clamp(22px, 5.6vw, 30px); font-weight: 700; }
+
+.panel { display: flex; flex-direction: column; gap: 12px; }
+.controls { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.ctl-group { display: grid; grid-template-columns: auto auto; gap: 4px 10px; background: #fff; border-radius: 26px; padding: 6px 10px 10px; box-shadow: 0 5px 0 #cfd5ea; }
+.ctl-label { grid-column: 1 / -1; grid-row: 1; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 16px; justify-content: center; }
+.swatch { width: 22px; height: 9px; border-radius: 5px; background: var(--hour); }
+.ctl-m .swatch { background: var(--minute); height: 6px; width: 30px; }
+.ctl { width: 60px; height: 60px; border: 0; border-radius: 50%; font-size: 34px; font-weight: 700; line-height: 1; color: #fff; background: var(--hour); box-shadow: 0 4px 0 #2a3f9c; display: grid; place-items: center; }
+.ctl-m .ctl { background: var(--minute); box-shadow: 0 4px 0 var(--accent-dark); }
+.ctl:active { transform: translateY(3px); box-shadow: none; }
+
+.options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.options.opt-words.n3 { grid-template-columns: 1fr; }
+.options.opt-clock.n3, .options.opt-digital.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.option {
+  position: relative; border: 0; min-height: 68px; border-radius: 22px; background: #fff; padding: 10px 12px;
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--mc) 70%, #26315c); transition: transform 0.1s, background 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.option:active { transform: translateY(4px); box-shadow: 0 2px 0 color-mix(in srgb, var(--mc) 70%, #26315c); }
+.option .words { font-size: clamp(19px, 4.8vw, 24px); font-weight: 700; line-height: 1.15; }
+.option .lcd { font-size: clamp(24px, 6.4vw, 40px); padding: 2px 10px; letter-spacing: 1px; }
+.option .clock.mini { width: min(150px, 100%); height: auto; }
+.option .key { position: absolute; left: 12px; top: 6px; font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+.option.right { background: var(--good); color: #fff; animation: pop-sm 0.35s; }
+.option.wrong { background: #ffe1e1; color: #b04a4a; }
+.option.reveal { background: var(--good); color: #fff; box-shadow: 0 6px 0 #22a860, 0 0 0 5px #fff, 0 0 0 9px var(--good); }
+.option.right .c-face, .option.reveal .c-face { fill: #eafff2; }
+.option.wrong .c-face { fill: #ffe9e9; }
+.shake { animation: shake 0.4s; }
+
+.feedback { min-height: 26px; text-align: center; font-weight: 600; font-size: 19px; line-height: 1.3; }
+.feedback:empty { min-height: 0; }
+.actions { display: flex; justify-content: center; }
+.actions .btn { min-height: 64px; min-width: 220px; font-size: 22px; }
+
+/* ---------- My day scene ---------- */
+.scene { overflow: hidden; border-top: 8px solid var(--mc); }
+.sky-box { position: relative; height: 150px; overflow: hidden; background: linear-gradient(#6ec6ff, #c9f0ff); transition: background 0.4s; }
+.sky-box.phase-dawn { background: linear-gradient(#ff9e7a, #ffe0a3); }
+.sky-box.phase-day { background: linear-gradient(#5dbbff, #c9f0ff); }
+.sky-box.phase-dusk { background: linear-gradient(#6b4fd8, #ff9a8a); }
+.sky-box.phase-night { background: linear-gradient(#0e1540, #2c3778); }
+.stars-bg {
+  position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s;
+  background-image: radial-gradient(2px 2px at 12% 20%, #fff 50%, transparent 51%), radial-gradient(2px 2px at 30% 45%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 52% 18%, #fff 50%, transparent 51%), radial-gradient(2px 2px at 70% 38%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 86% 14%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 92% 50%, #fff 50%, transparent 51%);
+}
+.phase-night .stars-bg { opacity: 1; }
+.phase-dusk .stars-bg { opacity: 0.4; }
+.orb { position: absolute; font-size: 40px; line-height: 1; transform: translate(-50%, -50%); transition: left 0.35s, top 0.35s; }
+.hill { position: absolute; left: -10%; right: -10%; bottom: -70px; height: 110px; border-radius: 50%; background: #7ed66f; box-shadow: inset 0 8px 0 #9be58a; }
+.phase-night .hill { background: #2f6b4a; box-shadow: inset 0 8px 0 #3d7d58; }
+.scene-art { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; justify-content: center; align-items: flex-end; gap: 6px; }
+.scene-mascot { width: 104px; height: 104px; flex: none; cursor: pointer; }
+.scene-emoji { font-size: 58px; line-height: 1; display: inline-flex; align-items: flex-end; }
+.scene-emoji .treat { font-size: 40px; margin-left: -10px; }
+.scene-emoji.in { animation: pop 0.4s; }
+.scene-text { padding: 10px 14px 14px; text-align: center; }
+.scene-line { font-size: clamp(19px, 4.6vw, 23px); font-weight: 700; }
+.scene-task { font-size: clamp(18px, 4.4vw, 22px); font-weight: 600; color: var(--accent-dark); margin-top: 2px; }
+
+.mascot-wrap.small { width: 110px; height: 110px; flex: none; cursor: pointer; }
+.corner { margin: auto auto 0 0; }
+.small .bubble { left: 92%; bottom: 50%; white-space: normal; width: max-content; max-width: min(300px, calc(100vw - 150px)); font-size: 17px; }
+
+/* Wide screens: clock on the left, question and answers on the right. */
+@media (min-width: 900px) {
+  .play-main { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-template-areas: "clock top" "clock panel"; gap: 16px 24px; grid-template-rows: auto 1fr; align-items: start; }
+  .play-main.no-clock { grid-template-columns: minmax(0, 640px); grid-template-areas: "top" "panel"; justify-content: center; }
+  .clock-area { grid-area: clock; }
+  .prompt, .scene { grid-area: top; }
+  .panel { grid-area: panel; }
+  .clock-holder { width: min(100%, 64vh, 480px); }
+  .mascot-wrap.corner { position: fixed; left: 16px; bottom: 16px; margin: 0; width: 130px; height: 130px; }
+  .mascot-wrap.corner .bubble { left: 60%; bottom: 100%; max-width: 230px; transform-origin: 20% 100%; }
+  .options.opt-clock.n4, .options.opt-digital.n4 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- results ---------- */
+#results { align-items: center; justify-content: center; padding: 100px 16px 24px; }
+.result-card { padding: 24px 20px; width: min(460px, 100%); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.result-card .mascot-wrap.big { margin-top: -90px; }
+.result-card .bubble { background: var(--gold); left: 60%; }
+.result-card .bubble::after { border-top-color: var(--gold); }
+.big-stars { display: flex; gap: 10px; font-size: 76px; line-height: 1; }
+.big-stars span { color: #e6e9f5; transform: scale(0.4); opacity: 0.4; transition: transform 0.4s cubic-bezier(.3, 1.8, .5, 1), opacity 0.3s; }
+.big-stars span.on { color: var(--gold); text-shadow: 0 5px 0 var(--gold-dark); transform: scale(1) rotate(-6deg); opacity: 1; }
+.big-stars span:nth-child(2).on { transform: scale(1.2) translateY(-10px); }
+.big-stars span.dim { transform: scale(0.85); opacity: 1; }
+.result-line { font-size: 21px; font-weight: 700; text-align: center; }
+.result-sub { font-size: 17px; font-weight: 600; color: var(--ink-soft); text-align: center; }
+.result-sub:empty { display: none; }
+.result-actions { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+.result-actions .btn { min-height: 60px; }
+
+/* ---------- phones ---------- */
+@media (max-width: 600px) {
+  #home { gap: 12px; }
+  .hero { flex-wrap: nowrap; gap: 10px; margin-top: 64px; }
+  .mascot-wrap.big { width: 130px; height: 130px; }
+  .big .bubble { font-size: 16px; left: 10%; max-width: min(250px, calc(100vw - 60px)); }
+  .total-card { min-width: 0; flex: 1; padding: 10px 12px; }
+  .total-num { font-size: 24px; }
+  .levels { gap: 6px; }
+  .level-card { border-radius: 16px; padding: 8px 2px 6px; min-height: 0; }
+  .level-card.sel { outline-width: 3px; box-shadow: 0 6px 0 #cfd5ea, 0 0 0 6px var(--rim); }
+  .level-stars { font-size: 11px; }
+  .mode-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mode { min-height: 116px; }
+  .mode b { font-size: 20px; }
+  .mode small { font-size: 13px; }
+  .mascot-wrap.small { width: 84px; height: 84px; }
+  .small .bubble { font-size: 15px; }
+  .sky-box { height: 118px; }
+  .scene-mascot { width: 84px; height: 84px; }
+  .scene-emoji { font-size: 46px; }
+  .ctl { width: 56px; height: 56px; }
+  .ctl-label { font-size: 15px; }
+  .controls { gap: 8px; }
+  .option { min-height: 64px; }
+  .result-card .mascot-wrap.big { width: 150px; height: 150px; margin-top: -70px; }
+  .result-card .bubble { left: 22%; max-width: min(220px, calc(100vw - 120px)); }
+  .big-stars { font-size: 60px; }
+}
+/* Phones in "My day": a smaller clock keeps the Check button on screen. */
+@media (max-width: 600px) and (max-height: 900px) {
+  #play[data-mode="day"] .clock-holder { width: min(100%, 32vh); }
+}
