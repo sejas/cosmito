@@ -31,6 +31,17 @@ Missing keys fall back to English, so partial translations still work.
 2. Open `shared/mascots/preview.html` to check every mood: idle, happy, wow, think, sleep, hop.
 3. Add a `<script>` for it to the hub (`index.html`). It will appear with the other friends.
 
+## Silent automated tests
+
+Browser tests must never make sound on the developer's machine. Launch Chrome with `--mute-audio`, and before loading pages stub read-aloud and mute the games:
+
+```js
+await context.addInitScript(() => {
+  if (window.speechSynthesis) speechSynthesis.speak = () => {}; // --mute-audio doesn't cover OS speech on macOS
+  localStorage.setItem("kids.muted", "true");
+});
+```
+
 ## Checks before a pull request
 
 ```sh
