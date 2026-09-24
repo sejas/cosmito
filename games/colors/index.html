@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Color Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>" />
+  <link rel="stylesheet" href="../../shared/base.css" />
+  <link rel="stylesheet" href="../../shared/mascot.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <header class="top">
+      <a class="round-btn" href="../../index.html" data-i18n-aria="hub">🏠</a>
+      <h1 class="logo">
+        <span class="l1" data-i18n="logo1"></span>
+        <span class="l2" data-i18n="logo2"></span>
+        <span class="l3" id="logoName"></span>
+      </h1>
+      <div class="settings">
+        <button class="chip" id="btnSound" type="button"></button>
+        <button class="chip" id="btnBuddy" type="button"></button>
+        <button class="chip" id="btnLang" type="button"></button>
+      </div>
+    </header>
+
+    <div class="hero">
+      <div class="mascot-wrap big" id="mascotHome">
+        <div class="bubble" id="bubbleHome" aria-live="polite"></div>
+      </div>
+      <div class="card total-card">
+        <div class="total-label" data-i18n="totalStars"></div>
+        <div class="total-num"><span id="totalStars">0</span> / <span id="maxStars">0</span> <span aria-hidden="true">⭐</span></div>
+        <div class="total-bar" aria-hidden="true"><div id="totalFill"></div></div>
+      </div>
+    </div>
+
+    <div class="sections" id="sections"></div>
+  </section>
+
+  <!-- QUIZ: colour names -->
+  <section id="quiz" class="screen">
+    <header class="top play-top">
+      <button class="round-btn btn-back" type="button" data-i18n-aria="back">⬅️</button>
+      <div class="play-title"><span id="quizTitle"></span><span class="dots" id="quizDots" aria-hidden="true"></span></div>
+      <button class="round-btn btn-names" type="button"><span aria-hidden="true">🔤</span></button>
+    </header>
+    <div class="play-main">
+      <div class="card prompt-card">
+        <div class="prompt" id="prompt"></div>
+        <button class="round-btn listen" id="btnListen" type="button" data-i18n-aria="listen">🔊</button>
+        <div class="buddy-corner mascot-wrap" id="mascotQuiz">
+          <div class="bubble" id="bubbleQuiz"></div>
+        </div>
+      </div>
+      <div class="options" id="options" role="group"></div>
+    </div>
+    <div class="sr-only" id="liveQuiz" aria-live="polite"></div>
+  </section>
+
+  <!-- LAB: mixing -->
+  <section id="lab" class="screen">
+    <header class="top play-top">
+      <button class="round-btn btn-back" type="button" data-i18n-aria="back">⬅️</button>
+      <div class="play-title"><span id="labTitle"></span><span class="dots" id="labDots" aria-hidden="true"></span></div>
+      <button class="round-btn btn-names" type="button"><span aria-hidden="true">🔤</span></button>
+    </header>
+    <div class="play-main lab-main">
+      <div class="card target-card" id="target" hidden></div>
+      <div class="card bench">
+        <div class="buddy-corner mascot-wrap" id="mascotLab">
+          <div class="bubble" id="bubbleLab"></div>
+        </div>
+        <div class="bowl-wrap">
+          <svg class="bowl" id="bowl" viewBox="0 0 220 150" role="img">
+            <defs>
+              <clipPath id="bowlClip"><path d="M14 40h192a96 96 0 0 1-192 0z" /></clipPath>
+            </defs>
+            <path class="bowl-back" d="M14 40h192a96 96 0 0 1-192 0z" />
+            <g clip-path="url(#bowlClip)">
+              <rect class="liquid" id="liquid" x="0" y="150" width="220" height="150" />
+              <ellipse class="liquid-top" id="liquidTop" cx="110" cy="150" rx="0" ry="7" />
+              <path class="swirl" id="swirl" d="M70 0q40 -14 80 0" transform="translate(0 150)" />
+            </g>
+            <path class="bowl-rim" d="M14 40h192a96 96 0 0 1-192 0z" />
+            <ellipse class="bowl-lip" cx="110" cy="40" rx="96" ry="9" />
+            <path class="bowl-shine" d="M34 60q6 34 34 52" />
+          </svg>
+          <div class="bowl-name" id="bowlName" aria-live="polite"></div>
+        </div>
+        <div class="parts" id="parts" aria-hidden="true"></div>
+        <button class="round-btn sponge" id="btnEmpty" type="button" data-i18n-aria="empty">🧽</button>
+      </div>
+      <div class="pots lab-pots" id="labPots" role="group"></div>
+      <div class="card shelf" id="shelf">
+        <div class="shelf-head"><span data-i18n="shelf"></span> <b id="foundCount"></b></div>
+        <div class="shelf-row" id="shelfRow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAINT -->
+  <section id="paint" class="screen">
+    <header class="top play-top">
+      <button class="round-btn btn-back" type="button" data-i18n-aria="back">⬅️</button>
+      <div class="play-title"><span id="paintTitle"></span><span class="stars" id="paintStars" aria-hidden="true"></span></div>
+      <button class="round-btn btn-names" type="button"><span aria-hidden="true">🔤</span></button>
+    </header>
+    <div class="play-main paint-main">
+      <div class="pic-strip" id="picStrip" role="group" data-i18n-aria="choosePicture" hidden></div>
+      <div class="card canvas-card">
+        <svg class="picture" id="picture" viewBox="0 0 200 200"></svg>
+      </div>
+      <div class="paint-side">
+        <div class="paint-buddy">
+          <div class="buddy-corner mascot-wrap" id="mascotPaint">
+            <div class="bubble" id="bubblePaint"></div>
+          </div>
+        </div>
+        <div class="pots paint-pots" id="paintPots" role="radiogroup"></div>
+        <div class="tools">
+          <button class="btn tool" id="btnClear" type="button"><span aria-hidden="true">🧽</span> <span data-i18n="clear"></span></button>
+          <button class="btn tool" id="btnSave" type="button"><span aria-hidden="true">💾</span> <span data-i18n="save"></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIN -->
+  <div class="win" id="win" role="dialog" aria-modal="true" aria-labelledby="winTitle" hidden>
+    <div class="card win-card">
+      <div class="mascot-wrap big" id="mascotWin">
+        <div class="bubble" id="bubbleWin"></div>
+      </div>
+      <h2 class="win-title" id="winTitle"></h2>
+      <div class="big-stars" id="bigStars" role="img"><span>★</span><span>★</span><span>★</span></div>
+      <div class="win-line" id="winLine"></div>
+      <div class="win-actions">
+        <button class="btn" id="btnReplay" type="button"><span aria-hidden="true">↺</span> <span data-i18n="replay"></span></button>
+        <button class="btn" id="btnWinSave" type="button"><span aria-hidden="true">💾</span> <span data-i18n="save"></span></button>
+        <button class="btn" id="btnHome" type="button"><span aria-hidden="true">🏠</span> <span data-i18n="home"></span></button>
+        <button class="btn primary" id="btnNext" type="button"><span data-i18n="next"></span> <span aria-hidden="true">▶</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/storage.js"></script>
+  <script src="../../shared/i18n.js"></script>
+  <script src="../../shared/audio.js"></script>
+  <script src="../../shared/fx.js"></script>
+  <script src="../../shared/mascot.js"></script>
+  <script src="../../shared/mascots/pipo.js"></script>
+  <script src="../../shared/mascots/bollo.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/palette.js"></script>
+  <script src="js/pictures.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
