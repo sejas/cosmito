@@ -80,4 +80,18 @@ const GAMES = [
     },
     skills: { en: "Vocabulary · English & Spanish", es: "Vocabulario · Español e inglés" },
   },
+  {
+    id: "clock",
+    href: "games/clock/",
+    emoji: "🕐",
+    mascot: "bollo",
+    color: "#b197fc",
+    maxStars: 60,
+    title: { en: (name) => `Tell the Time with ${name}`, es: (name) => `La hora con ${name}` },
+    about: {
+      en: (name) => `Read the clock, move the hands and plan ${name}'s busy day!`,
+      es: (name) => `¡Lee el reloj, mueve las agujas y organiza el día de ${name}!`,
+    },
+    skills: { en: "Time · Clocks", es: "La hora · Relojes" },
+  },
 ];
