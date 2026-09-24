@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mascot preview</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../base.css" />
+  <link rel="stylesheet" href="../mascot.css" />
+  <style>
+    /* Developer page: every registered mascot in every mood. */
+    main { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 20px 16px 40px; }
+    header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    h1 { margin: 0; font-size: 28px; flex: 1; }
+    .hint { margin: 0 0 16px; color: var(--ink-soft); }
+    .hint code { background: rgba(255, 255, 255, 0.6); padding: 1px 6px; border-radius: 6px; }
+    .mascot-card { padding: 16px 20px 20px; margin-bottom: 20px; }
+    .mascot-card h2 { margin: 0; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+    .swatch { width: 18px; height: 18px; border-radius: 50%; display: inline-block; }
+    .about { margin: 2px 0 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .about .treat { width: 22px; height: 22px; font-size: 20px; line-height: 22px; }
+    .moods { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px; }
+    .cell { background: linear-gradient(var(--sky-top), var(--sky-bottom)); border-radius: 18px; padding: 10px; text-align: center; }
+    .cell .mascot-wrap { width: 108px; height: 108px; margin: 0 auto; }
+    .cell.small .mascot-wrap { width: 84px; height: 84px; margin: 12px auto; }
+    .cell span { font-weight: 600; font-size: 14px; }
+    .talk { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-top: 16px; }
+    .stage { position: relative; width: 190px; height: 190px; margin-right: 180px; }
+    .stage .mascot-wrap { width: 100%; height: 100%; }
+    .controls { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .controls label { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .controls input { width: 180px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>🎨 Mascot preview</h1>
+      <button class="chip" id="lang"></button>
+    </header>
+    <p class="hint">
+      Every mascot from <code>Mascots.list()</code> in every mood, at 108px, 84px and 190px. The class contract lives in
+      <code>shared/mascot.js</code>. Add <code>?mouth=0.8</code> to open every mouth.
+    </p>
+    <div id="list"></div>
+  </main>
+
+  <script src="../storage.js"></script>
+  <script src="../i18n.js"></script>
+  <script src="../audio.js"></script>
+  <script src="../mascot.js"></script>
+  <script src="pipo.js"></script>
+  <script src="bollo.js"></script>
+  <script>
+    const MOODS = ["idle", "happy", "wow", "think", "sleep", "hop"];
+    const list = document.getElementById("list");
+    const startMouth = Number(new URLSearchParams(location.search).get("mouth")) || 0;
+    KidsI18n.mountPicker(document.getElementById("lang"));
+
+    function el(tag, cls, text) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    function card(def) {
+      const pick = KidsI18n.pickLang;
+      const section = el("section", "card mascot-card");
+      const title = el("h2", "", `${def.emoji} ${pick(def.name)}`);
+      const swatch = el("span", "swatch");
+      swatch.style.background = def.color;
+      title.append(swatch, el("code", "", def.id));
+      const about = el("p", "about", pick(def.about) || "");
+      about.append(" · ", Mascots.treatEl(def), Mascots.treatName(def), ` · 🔊 ${def.sound || "chirp"}`);
+      section.append(title, about);
+
+      // One mascot per mood, plus the small size used in game corners.
+      const grid = el("div", "moods");
+      const all = [];
+      const addCell = (mood, label, small) => {
+        const cell = el("div", small ? "cell small" : "cell");
+        const wrap = el("div");
+        cell.append(wrap, el("span", "", label));
+        grid.append(cell);
+        const m = Mascots.create(wrap, null, def.id);
+        m.setMood(mood);
+        all.push(m);
+      };
+      MOODS.forEach((mood) => addCell(mood, mood));
+      addCell("idle", "idle · 84px", true);
+      addCell("happy", "happy · 84px", true);
+      addCell("sleep", "sleep · 84px", true);
+
+      // Talking stage: the 190px size with a bubble, mouth slider and say button.
+      const talk = el("div", "talk");
+      const stage = el("div", "stage");
+      const wrap = el("div");
+      const bubble = el("div", "bubble");
+      wrap.append(bubble);
+      stage.append(wrap);
+      const talker = Mascots.create(wrap, bubble, def.id);
+      all.push(talker);
+
+      const controls = el("div", "controls");
+      const label = el("label", "", "mouth");
+      const slider = el("input");
+      const out = el("code");
+      Object.assign(slider, { type: "range", min: 0, max: 1, step: 0.01, value: startMouth });
+      const setMouth = () => {
+        const v = Number(slider.value);
+        all.forEach((m) => m.mouth(v));
+        out.textContent = v.toFixed(2);
+      };
+      slider.addEventListener("input", setMouth);
+      setMouth();
+      label.append(slider, out);
+
+      let line = 0;
+      const say = el("button", "btn primary", "💬 say");
+      say.addEventListener("click", () => {
+        const lines = pick(def.greeting) || [];
+        if (!lines.length) return;
+        talker.say(lines[line++ % lines.length]);
+        talker.sound();
+        talker.setMood("happy", 1200);
+      });
+      controls.append(label, say);
+      talk.append(stage, controls);
+      section.append(grid, talk);
+      return section;
+    }
+
+    function render() {
+      list.textContent = "";
+      Mascots.list().forEach((def) => list.append(card(def)));
+    }
+
+    render();
+    KidsI18n.onChange(render);
+  </script>
+</body>
+</html>

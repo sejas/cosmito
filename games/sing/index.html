@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>" />
+  <link rel="stylesheet" href="../../shared/base.css" />
+  <link rel="stylesheet" href="../../shared/mascot.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <header class="home-head">
+      <a class="round-btn" href="../../index.html" data-i18n-aria="allGames">🏠</a>
+      <h1 class="logo"><span data-i18n="logo1">Sing</span> <span data-i18n="logo2">with</span> <span class="logo-buddy" id="logoName">Pipo</span> 🎤</h1>
+      <div class="settings">
+        <button class="chip" id="btnBuddy" type="button"></button>
+        <button class="chip" id="btnSpeed" type="button"></button>
+        <button class="chip" id="btnGuide" type="button"></button>
+        <button class="chip" id="btnNames" type="button"></button>
+        <button class="chip" id="btnLang" type="button"></button>
+      </div>
+    </header>
+
+    <div class="home-hero">
+      <div class="mascot-wrap big" id="mascotHome">
+        <div class="bubble" id="bubbleHome"></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-title" id="rankTitle"></div>
+        <div class="rank-stars"><span id="rankStars">0</span> / <span id="rankMax">0</span> ⭐</div>
+        <div class="rank-bar"><div id="rankFill"></div></div>
+        <div class="rank-next" id="rankNext"></div>
+      </div>
+    </div>
+
+    <h2 class="pick" data-i18n="pickSong"></h2>
+    <div class="songs" id="songList"></div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="screen">
+    <header class="game-head">
+      <button class="round-btn" id="btnBack" type="button" data-i18n-aria="songs">⬅️</button>
+      <div class="game-title" id="gameTitle"></div>
+      <div class="score-pill">⭐ <span id="scoreNow">0</span></div>
+    </header>
+    <div class="progress">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-buddy" id="progressBuddy"></div>
+      <div class="progress-flag">🏁</div>
+    </div>
+    <div class="stage" id="stage">
+      <canvas id="canvas"></canvas>
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="lyrics" id="lyrics"></div>
+    <div class="mascot-wrap small" id="mascotGame">
+      <div class="bubble" id="bubbleGame"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="screen">
+    <div class="result-card">
+      <div class="mascot-wrap big" id="mascotResult">
+        <div class="bubble" id="bubbleResult"></div>
+      </div>
+      <div class="big-stars" id="bigStars">
+        <span>★</span><span>★</span><span>★</span>
+      </div>
+      <div class="result-line" id="resultLine"></div>
+      <div class="result-actions">
+        <button class="btn primary" id="btnAgain" type="button" data-i18n="again"></button>
+        <button class="btn" id="btnSongs" type="button" data-i18n="songs"></button>
+      </div>
+    </div>
+  </section>
+
+  <script src="../../shared/storage.js"></script>
+  <script src="../../shared/i18n.js"></script>
+  <script src="../../shared/audio.js"></script>
+  <script src="../../shared/fx.js"></script>
+  <script src="../../shared/mascot.js"></script>
+  <script src="../../shared/mascots/pipo.js"></script>
+  <script src="../../shared/mascots/bollo.js"></script>
+  <script src="js/pitch.js"></script>
+  <script src="js/songs.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

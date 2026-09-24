@@ -1,0 +1,70 @@
+.hub { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 16px 16px 40px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.hub-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.logo {
+  margin: 0; font-size: clamp(30px, 6.5vw, 50px); font-weight: 700; color: #fff;
+  text-shadow: 0 3px 0 var(--accent), 0 6px 0 rgba(38, 49, 92, 0.2); letter-spacing: 0.5px;
+}
+.hub-settings { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+
+/* Mascots */
+.friends-row { display: flex; justify-content: center; gap: clamp(8px, 4vw, 48px); flex-wrap: wrap; margin-top: 70px; }
+.friend {
+  border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  width: 190px;
+}
+.friend-mascot { width: 170px; height: 170px; }
+.friend-badge {
+  font-size: 14px; font-weight: 700; padding: 3px 12px; border-radius: 99px;
+  background: rgba(255, 255, 255, 0.6); color: var(--ink-soft); order: 3; margin-top: 6px;
+}
+.friend.chosen .friend-badge { background: var(--gold); color: var(--ink); box-shadow: 0 3px 0 var(--gold-dark); }
+.friend.chosen .friend-name { transform: scale(1.08); }
+.friend-mascot .bubble { left: 50%; bottom: 96%; transform-origin: 0 100%; white-space: normal; width: max-content; max-width: 220px; margin-left: -40px; }
+.friend-name {
+  font-size: 24px; font-weight: 700; background: #fff; color: var(--ink); border: 4px solid var(--c);
+  padding: 2px 18px; border-radius: 99px; box-shadow: 0 4px 0 rgba(38, 49, 92, 0.15); margin-top: 4px;
+}
+.friend-about { font-size: 14px; color: var(--ink-soft); text-align: center; max-width: 180px; line-height: 1.2; margin-top: 4px; }
+
+/* Global progress */
+.trophy { display: flex; align-items: center; gap: 18px; padding: 16px 22px; margin: 28px auto 0; max-width: 520px; }
+.trophy-icon { font-size: 54px; animation: m-floaty 3s ease-in-out infinite; }
+.trophy-body { flex: 1; min-width: 0; }
+.trophy-rank { font-size: 22px; font-weight: 700; }
+.trophy-count { font-weight: 600; color: var(--ink-soft); margin: 2px 0 8px; }
+.trophy-bar { height: 16px; background: #eef1fb; border-radius: 99px; overflow: hidden; }
+.trophy-bar div { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 99px; transition: width 0.8s; }
+.trophy-next { font-size: 14px; color: var(--ink-soft); margin-top: 6px; }
+
+/* Games */
+.section-title { text-align: center; font-size: 28px; margin: 34px 0 16px; }
+.games { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.game-card { display: flex; flex-direction: column; overflow: hidden; text-decoration: none; transition: transform 0.15s; }
+a.game-card:hover { transform: translateY(-5px) rotate(-1deg); }
+a.game-card:active { transform: translateY(2px); }
+.game-top {
+  height: 110px; background: var(--c, #e9ecf8); display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: 58px; position: relative;
+}
+.game-mascot { font-size: 44px; transform: rotate(8deg) translateY(12px); }
+.game-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 4px; }
+.game-title { font-size: 22px; font-weight: 700; }
+.game-about { color: var(--ink-soft); font-size: 16px; line-height: 1.25; }
+.game-skills { font-size: 13px; font-weight: 600; color: var(--accent-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.game-progress { height: 12px; background: #eef1fb; border-radius: 99px; overflow: hidden; margin-top: 10px; }
+.game-progress div { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 99px; }
+.game-stars { font-weight: 600; font-size: 15px; }
+.soon { opacity: 0.85; border: 3px dashed #cfd5ea; box-shadow: none; background: rgba(255, 255, 255, 0.6); }
+.soon .game-top { background: none; }
+
+.hub-foot { text-align: center; margin-top: 36px; color: var(--ink-soft); font-weight: 500; }
+
+@media (max-width: 600px) {
+  .friends-row { margin-top: 64px; }
+  .friend { width: 150px; }
+  .friend-mascot { width: 128px; height: 128px; }
+  .friend-mascot .bubble { font-size: 15px; max-width: 170px; margin-left: -60px; }
+  .trophy-icon { font-size: 40px; }
+}

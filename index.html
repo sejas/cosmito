@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pipo &amp; Friends</title>
+  <meta name="description" content="Free, open-source learning games for kids." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎈</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared/base.css" />
+  <link rel="stylesheet" href="shared/mascot.css" />
+  <link rel="stylesheet" href="hub/hub.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span>
+  </div>
+
+  <main class="hub">
+    <header class="hub-head">
+      <h1 class="logo" data-i18n="title"></h1>
+      <div class="hub-settings">
+        <button class="chip" id="btnSound" type="button"></button>
+        <button class="chip" id="btnLang" type="button"></button>
+      </div>
+    </header>
+
+    <section class="friends" aria-labelledby="friendsTitle">
+      <h2 id="friendsTitle" class="sr-only" data-i18n="meet"></h2>
+      <div class="friends-row" id="friends"></div>
+    </section>
+
+    <section class="trophy card" aria-live="polite">
+      <div class="trophy-icon">🏆</div>
+      <div class="trophy-body">
+        <div class="trophy-rank" id="rank"></div>
+        <div class="trophy-count"><span id="stars">0</span> / <span id="maxStars">0</span> ⭐</div>
+        <div class="trophy-bar"><div id="bar"></div></div>
+        <div class="trophy-next" id="next"></div>
+      </div>
+    </section>
+
+    <h2 class="section-title" data-i18n="play"></h2>
+    <div class="games" id="games"></div>
+
+    <footer class="hub-foot">
+      <span data-i18n="free"></span>
+    </footer>
+  </main>
+
+  <script src="shared/storage.js"></script>
+  <script src="shared/i18n.js"></script>
+  <script src="shared/audio.js"></script>
+  <script src="shared/fx.js"></script>
+  <script src="shared/mascot.js"></script>
+  <script src="shared/mascots/pipo.js"></script>
+  <script src="shared/mascots/bollo.js"></script>
+  <script src="hub/games.js"></script>
+  <script src="hub/hub.js"></script>
+</body>
+</html>

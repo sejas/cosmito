@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Red bell pepper: Bollo's favourite food and the reward in his games. -->
+  <path d="M50 30 C56 18 64 12 72 11" fill="none" stroke="#2f9e44" stroke-width="7" stroke-linecap="round"/>
+  <path d="M30 34 C36 28 44 30 50 34 C56 30 64 28 70 34 C74 30 78 29 82 33 L78 38 L22 38 L18 33 C22 29 26 30 30 34Z" fill="#40c057"/>
+  <path d="M20 40 C14 52 14 70 22 82 C28 91 38 93 44 88 C47 92 53 92 56 88 C62 93 72 91 78 82 C86 70 86 52 80 40 C74 33 62 33 56 38 C53 35 47 35 44 38 C38 33 26 33 20 40Z" fill="#e8413c"/>
+  <path d="M44 40 C40 54 40 72 44 86" fill="none" stroke="#b92a26" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  <path d="M56 40 C60 54 60 72 56 86" fill="none" stroke="#b92a26" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  <path d="M27 48 C24 56 24 64 27 70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+</svg>

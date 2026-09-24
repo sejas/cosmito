@@ -1,0 +1,52 @@
+/* Mascot moods — generic, driven by the class contract in shared/mascot.js. */
+.mascot-wrap { position: relative; }
+.mascot { width: 100%; height: 100%; overflow: visible; animation: m-breathe 3s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes m-breathe { 50% { transform: scale(1.03, 0.97); } }
+
+.mascot .eyes-happy, .mascot .eyes-closed, .mascot .zzz, .mascot .sparkles { display: none; }
+.mascot .lid { animation: m-blink 4.5s infinite; transform-box: fill-box; transform-origin: center; transform: scaleY(0); }
+@keyframes m-blink { 0%, 94%, 100% { transform: scaleY(0); } 97% { transform: scaleY(1); } }
+.mascot .mouth { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(var(--mouth, 0)); }
+.mascot .jaw { transform-box: fill-box; transform-origin: 50% 0; transform: translateY(calc(var(--mouth, 0) * 9px)); transition: transform 0.06s; }
+.mascot .limb { transform-box: fill-box; }
+.mascot .limb.l { transform-origin: 90% 20%; }
+.mascot .limb.r { transform-origin: 10% 20%; }
+.mascot .float { animation: m-floaty 2.4s ease-in-out infinite; }
+@keyframes m-floaty { 50% { transform: translateY(-8px) rotate(8deg); } }
+
+.mood-happy .mascot { animation: m-hop 0.5s ease-in-out infinite; }
+.mood-happy .eyes-open { display: none; }
+.mood-happy .eyes-happy { display: inline; }
+.mood-happy .limb.l { animation: m-flapL 0.25s ease-in-out infinite alternate; }
+.mood-happy .limb.r { animation: m-flapR 0.25s ease-in-out infinite alternate; }
+.mood-happy .sparkles { display: inline; }
+@keyframes m-hop { 50% { transform: translateY(-10%) scale(1.02); } }
+@keyframes m-flapL { to { transform: rotate(35deg); } }
+@keyframes m-flapR { to { transform: rotate(-35deg); } }
+
+.mood-wow .pupil { transform: scale(1.25); transform-box: fill-box; transform-origin: center; }
+.mood-wow .sparkles { display: inline; }
+.mood-wow .mascot { animation: m-hop 0.8s ease-in-out 2; }
+
+.mood-think .mascot { animation: m-tilt 1.6s ease-in-out infinite; }
+@keyframes m-tilt { 50% { transform: rotate(-8deg); } }
+
+.mood-sleep .eyes-open { display: none; }
+.mood-sleep .eyes-closed, .mood-sleep .zzz { display: inline; }
+.mood-sleep .zzz { animation: m-floaty 2s ease-in-out infinite; }
+
+.mood-hop .mascot { animation: m-hop 0.35s ease-in-out 1; }
+
+/* Speech bubble: place it with left/bottom per page. */
+.bubble {
+  position: absolute; left: 88%; bottom: 72%; background: #fff; color: var(--ink);
+  padding: 10px 16px; border-radius: 20px; font-weight: 600; font-size: 18px;
+  white-space: nowrap; box-shadow: var(--shadow); opacity: 0; transform: scale(0.6) translateY(10px);
+  transform-origin: 0 100%; transition: opacity 0.2s, transform 0.25s cubic-bezier(.3,1.6,.5,1);
+  pointer-events: none; z-index: 6;
+}
+.bubble::after {
+  content: ""; position: absolute; left: 10px; bottom: -10px; border: 10px solid transparent;
+  border-top-color: #fff; border-bottom: 0; border-left-width: 4px;
+}
+.bubble.show { opacity: 1; transform: none; }

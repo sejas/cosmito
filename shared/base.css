@@ -1,0 +1,92 @@
+/* Shared look & feel for every game. Load after the Fredoka Google Font. */
+:root {
+  --sky-top: #7ec8ff;
+  --sky-bottom: #c9f0ff;
+  --ink: #26315c;
+  --ink-soft: #5a6694;
+  --card: #ffffff;
+  --accent: #ff6b9a;
+  --accent-dark: #e24c7f;
+  --gold: #ffc93c;
+  --gold-dark: #f0a500;
+  --good: #3ddc84;
+  --bad: #ff6b6b;
+  --radius: 24px;
+  --shadow: 0 8px 0 rgba(38, 49, 92, 0.12), 0 14px 30px rgba(38, 49, 92, 0.12);
+  --font: "Fredoka", "Comic Sans MS", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: linear-gradient(var(--sky-top), var(--sky-bottom)) fixed;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+/* Components below set `display`; keep the hidden attribute working. */
+[hidden] { display: none !important; }
+a { color: inherit; }
+
+/* Drifting clouds: <div class="sky"><span class="cloud c1"></span>…</div> */
+.sky { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.cloud { position: absolute; background: #fff; border-radius: 999px; opacity: 0.85; width: 160px; height: 48px; animation: drift linear infinite; }
+.cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+.cloud::before { width: 70px; height: 70px; left: 24px; top: -34px; }
+.cloud::after { width: 54px; height: 54px; left: 80px; top: -24px; }
+.c1 { top: 12%; animation-duration: 70s; }
+.c2 { top: 40%; animation-duration: 95s; animation-delay: -40s; transform: scale(0.7); }
+.c3 { top: 72%; animation-duration: 120s; animation-delay: -80s; transform: scale(1.2); }
+@keyframes drift { from { left: -220px; } to { left: 110%; } }
+
+/* Screens: only .active is shown */
+.screen { display: none; position: relative; z-index: 1; min-height: 100dvh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* Buttons */
+.chip {
+  border: 0; background: var(--card); padding: 8px 14px; border-radius: 999px;
+  font-weight: 600; font-size: 15px; box-shadow: 0 4px 0 rgba(38, 49, 92, 0.15);
+  transition: transform 0.1s; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+}
+.chip:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(38, 49, 92, 0.15); }
+.btn {
+  border: 0; border-radius: 99px; padding: 14px 26px; font-weight: 700; font-size: 20px;
+  background: #eef1fb; box-shadow: 0 5px 0 #cfd5ea; text-decoration: none; display: inline-block;
+}
+.btn.primary { background: var(--accent); color: #fff; box-shadow: 0 5px 0 var(--accent-dark); }
+.btn:active { transform: translateY(4px); box-shadow: none; }
+.round-btn {
+  border: 0; width: 46px; height: 46px; border-radius: 50%; background: rgba(255, 255, 255, 0.85);
+  font-size: 22px; display: grid; place-items: center; flex: none; text-decoration: none;
+  box-shadow: 0 4px 0 rgba(38, 49, 92, 0.15);
+}
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+:focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
+
+/* Stars row: <span class="stars"><span class="on">★</span>…</span> */
+.stars { letter-spacing: 2px; color: #dfe3f2; }
+.stars .on { color: var(--gold); text-shadow: 0 2px 0 var(--gold-dark); }
+
+/* fx.js */
+.kids-confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+.kids-burst {
+  position: fixed; z-index: 51; pointer-events: none; font-size: 26px; transform: translate(-50%, -50%);
+  animation: kids-burst 0.9s ease-out forwards;
+}
+img.kids-burst { width: 30px; height: 30px; }
+@keyframes kids-burst {
+  to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4); opacity: 0; }
+}
+@keyframes pop { 50% { transform: scale(1.25); } }
+/* Gentler pop for wide elements (1.25× overflows phone screens). */
+@keyframes pop-sm { 50% { transform: scale(1.06); } }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
