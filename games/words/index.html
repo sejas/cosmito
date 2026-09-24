@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Words</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" />
+  <link rel="stylesheet" href="../../shared/base.css" />
+  <link rel="stylesheet" href="../../shared/mascot.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <header class="top">
+      <a class="round-btn" href="../../index.html" data-i18n-aria="hub">🏠</a>
+      <h1 class="logo">
+        <span class="l1" data-i18n="logo1"></span>
+        <span class="l2" data-i18n="logo2"></span>
+        <span class="l3" id="logoName"></span>
+      </h1>
+      <div class="settings">
+        <button class="chip" id="btnSound" type="button"></button>
+        <button class="chip" id="btnBuddy" type="button"></button>
+        <button class="chip" id="btnLang" type="button"></button>
+      </div>
+    </header>
+
+    <div class="home-grid">
+      <div class="hero">
+        <div class="mascot-wrap big" id="mascotHome">
+          <div class="bubble" id="bubbleHome" aria-live="polite"></div>
+        </div>
+        <div class="hero-cards">
+          <div class="card target-card">
+            <div class="target-label" id="targetLabel"></div>
+            <button class="target-btn" id="btnTarget" type="button">
+              <span class="target-flag" id="targetFlag" aria-hidden="true"></span>
+              <span class="target-name" id="targetName"></span>
+              <span class="target-swap" aria-hidden="true">⇄</span>
+            </button>
+          </div>
+          <div class="card progress-card">
+            <div class="progress-row">
+              <span class="progress-label" data-i18n="totalStars"></span>
+              <span class="progress-num"><span id="totalStars">0</span> / <span id="maxStars">0</span> <span aria-hidden="true">⭐</span></span>
+            </div>
+            <div class="bar" aria-hidden="true"><div id="totalFill"></div></div>
+            <button class="btn book-btn" id="btnBook" type="button">
+              <span aria-hidden="true">📒</span> <span data-i18n="stickers"></span>
+              <b id="bookCount"></b>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-col">
+        <h2 class="pick" data-i18n="pickPack"></h2>
+        <div class="packs" id="packGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PACK: pick a mode, browse the words -->
+  <section id="pack" class="screen">
+    <header class="top game-top">
+      <button class="round-btn" id="packBack" type="button" data-i18n-aria="back">⬅️</button>
+      <div class="game-title" id="packTitle"></div>
+      <div class="pill" id="packStars"></div>
+    </header>
+    <div class="mode-grid" id="modeGrid"></div>
+    <h3 class="gallery-title" id="galleryTitle"></h3>
+    <div class="gallery" id="gallery"></div>
+    <div class="mascot-wrap small corner" id="mascotPack">
+      <div class="bubble" id="bubblePack" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- PLAY: listen, picture, spell, memory -->
+  <section id="play" class="screen">
+    <header class="top game-top">
+      <button class="round-btn" id="playBack" type="button" data-i18n-aria="back">⬅️</button>
+      <div class="game-title" id="playTitle"></div>
+      <div class="pill" id="pairsPill" hidden></div>
+    </header>
+    <div class="dots" id="dots" role="progressbar" aria-valuemin="0"></div>
+    <div class="play-body">
+      <div class="card q-card" id="qCard">
+        <div class="q-prompt" id="qPrompt"></div>
+        <div class="q-visual" id="qVisual"></div>
+        <div class="q-word" id="qWord" aria-live="polite"></div>
+        <div class="spell-row" id="spellRow" hidden></div>
+      </div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="choices" id="choices"></div>
+      <div class="tiles" id="tiles" hidden></div>
+      <div class="board" id="board" hidden></div>
+      <button class="btn primary next-btn" id="btnNext" type="button" data-i18n="next" hidden></button>
+    </div>
+    <div class="mascot-wrap small corner" id="mascotPlay">
+      <div class="bubble" id="bubblePlay"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="screen">
+    <div class="result-card card">
+      <div class="mascot-wrap big" id="mascotResult">
+        <div class="bubble" id="bubbleResult"></div>
+      </div>
+      <div class="big-stars" id="bigStars" role="img">
+        <span>★</span><span>★</span><span>★</span>
+      </div>
+      <div class="result-line" id="resultLine" aria-live="polite"></div>
+      <div class="new-stickers" id="newStickers"></div>
+      <div class="result-actions">
+        <button class="btn primary" id="btnAgain" type="button" data-i18n="playAgain"></button>
+        <button class="btn" id="btnToPack" type="button" data-i18n="packBtn"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKER BOOK -->
+  <section id="book" class="screen">
+    <header class="top game-top">
+      <button class="round-btn" id="bookBack" type="button" data-i18n-aria="back">⬅️</button>
+      <div class="game-title" data-i18n="bookTitle"></div>
+      <div class="pill" id="bookPill"></div>
+    </header>
+    <p class="book-hint" data-i18n="bookHint"></p>
+    <div class="book" id="bookBody"></div>
+  </section>
+
+  <script src="../../shared/storage.js"></script>
+  <script src="../../shared/i18n.js"></script>
+  <script src="../../shared/audio.js"></script>
+  <script src="../../shared/fx.js"></script>
+  <script src="../../shared/mascot.js"></script>
+  <script src="../../shared/mascots/pipo.js"></script>
+  <script src="../../shared/mascots/bollo.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/words.js"></script>
+  <script src="js/logic.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
