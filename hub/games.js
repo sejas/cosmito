@@ -66,4 +66,18 @@ const GAMES = [
     },
     skills: { en: "Colours · Mixing", es: "Colores · Mezclas" },
   },
+  {
+    id: "words",
+    href: "games/words/",
+    emoji: "📚",
+    mascot: "pipo",
+    color: "#8fd3ff",
+    maxStars: 96,
+    title: { en: (name) => `Words with ${name}`, es: (name) => `Palabras con ${name}` },
+    about: {
+      en: (name) => `Learn words in English and Spanish with ${name}: listen, read, spell and match!`,
+      es: (name) => `¡Aprende palabras en español e inglés con ${name}: escucha, lee, escribe y empareja!`,
+    },
+    skills: { en: "Vocabulary · English & Spanish", es: "Vocabulario · Español e inglés" },
+  },
 ];

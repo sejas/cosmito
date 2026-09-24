@@ -8,6 +8,7 @@ Free, open-source learning games for kids. No ads, no accounts, no tracking. Jus
 | 🔢 **Times Tables with Bollo**: learn, practise and race through the times tables | 🐹 Bollo the guinea pig | Multiplication |
 | 🧩 **Code with Pipo**: wordless coding puzzles with arrows, loops, debugging and conditionals (ages 4–9) | 🐤 Pipo | Coding, logic |
 | 🎨 **Color Lab with Pipo**: colour names, a paint-mixing lab and colour-by-symbol pictures (ages 3–7) | 🐤 Pipo | Colours, mixing |
+| 📚 **Words with Pipo**: picture vocabulary in English and Spanish (listen, read, spell, memory, sticker book) | 🐤 Pipo | Vocabulary, languages |
 
 Every game is available in **English and Spanish**, and can be played with **any mascot**. Pick your buddy and language once on the hub; every game follows.
 
