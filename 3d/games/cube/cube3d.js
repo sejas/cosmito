@@ -764,6 +764,9 @@ function renderGuide(stepChanged = false) {
   const dirs = $("#dirs");
   dirs.textContent = "";
   if (!exp) {
+    // all done: no more buttons or step talk under the celebration
+    explain("");
+    for (const id of ["#btnWatch", "#btnSkip", "#btnDid", "#btnBack"]) $(id).hidden = true;
     $("#mvGlyph").textContent = "🎉";
     $("#mvText").textContent = t("solvedGuide");
     $("#mvAlg").textContent = "";
