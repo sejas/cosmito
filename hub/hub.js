@@ -7,6 +7,7 @@
       meet: "Meet the friends",
       play: "What shall we play?",
       free: "Free & open-source games for kids · Made with 💛",
+      try3d: "✨ Try 3D",
       soundOn: "🔊 Sound",
       soundOff: "🔇 Muted",
       soon: "More games coming soon!",
@@ -30,6 +31,7 @@
       meet: "Conoce a los amigos",
       play: "¿A qué jugamos?",
       free: "Juegos gratis y de código abierto para peques · Hecho con 💛",
+      try3d: "✨ Prueba en 3D",
       soundOn: "🔊 Sonido",
       soundOff: "🔇 Silencio",
       soon: "¡Pronto habrá más juegos!",
@@ -165,6 +167,13 @@
         : t("maxed");
   }
 
+  // The 3D edition needs WebGL2; only offer it where it can run.
+  function render3dLink() {
+    const link = $("#link3d");
+    link.hidden = !("WebGL2RenderingContext" in window);
+    link.textContent = t("try3d");
+  }
+
   function renderSound() {
     $("#btnSound").textContent = KidsAudio.isMuted()
       ? t("soundOff")
@@ -178,6 +187,7 @@
     renderGames();
     renderTrophy();
     renderSound();
+    render3dLink();
   }
 
   KidsI18n.mountPicker($("#btnLang"));

@@ -40,7 +40,13 @@ shared/               used by every game
   mascot.js/.css      Mascots: mascot framework and moods
   mascots/            pipo.js, bollo.js, preview.html (every mascot in every mood)
 games/<game>/         one folder per game
+3d/                   Pipo & Friends 3D: three.js hub, kit (3d/kit/) and 3D games
+vendor/three/         three.js, kept in the repo (MIT), so no CDN is needed
 ```
+
+## 3D edition
+
+`3d/` is a three.js version of the collection: a floating-island hub where each game is a portal, and toy-like 3D versions of the mascots. It shares progress, language and buddy with the classic games, and falls back to them on devices without WebGL2. See [3d/README.md](3d/README.md) to build a 3D game.
 
 ## Contributing
 

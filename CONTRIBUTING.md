@@ -17,6 +17,10 @@ Thanks for helping kids learn! A few principles:
 5. Add an entry to `hub/games.js`, using the same `maxStars`.
 6. Add tests for pure logic where it makes sense (`games/<your-game>/js/*.test.js`, run with `node --test`).
 
+## Build a 3D version
+
+Follow [3d/README.md](3d/README.md). Shared scripts (`KidsI18n`, `Mascots`…) are top-level `const`s, not properties of `window`: ES modules reach them by bare name or through `Kit.I18N()` etc.
+
 ## Add a language
 
 1. Add it to `LANGS` in `shared/i18n.js`.
@@ -45,6 +49,6 @@ await context.addInitScript(() => {
 ## Checks before a pull request
 
 ```sh
-node --test games/*/js/*.test.js   # logic tests
+node --test games/*/js/*.test.js "3d/**/*.test.js"   # logic tests
 python3 -m http.server 8000   # then play your change in the browser, desktop and phone width
 ```
