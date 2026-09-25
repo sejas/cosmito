@@ -22,7 +22,15 @@ export {
 export { createSky, createClouds, createSparkles, SKY } from "./sky.js";
 export { COLORS } from "./particles.js";
 export { ease, clamp, lerp, damp, Spring, Tweens } from "./motion.js";
-export { fitDistance, orbitPosition, frame } from "./view.js";
+export {
+  fitDistance,
+  orbitPosition,
+  frame,
+  fitPoints,
+  boxPoints,
+  ellipsePoints,
+} from "./view.js";
+export { clampPin, isShown } from "./screen.js";
 export { LEVELS, settingsFor } from "./quality.js";
 export { KIT_DICT, kt } from "./i18n.js";
 export * as ui from "./ui.js";
