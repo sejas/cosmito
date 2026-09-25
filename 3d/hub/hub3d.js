@@ -317,6 +317,9 @@ if (stage) {
   Mascots.onBuddyChange(render);
 }
 
-KidsI18n.onChange(render);
+KidsI18n.onChange(() => {
+  render();
+  stage?.refit(); // texts changed: the HUD may be taller or shorter now
+});
 render();
 games.forEach((g, i) => portals[i]?.setReady(g.ready));

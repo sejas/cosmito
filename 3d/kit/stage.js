@@ -9,7 +9,8 @@
 import * as THREE from "three";
 import { Tweens, Spring, damp } from "./motion.js";
 import { QualityGovernor, settingsFor, initialLevel } from "./quality.js";
-import { frame as frameView } from "./view.js";
+import { frame as frameView, fitPoints } from "./view.js";
+import { clampPin, isShown } from "./screen.js";
 import { createSky } from "./sky.js";
 import { timed } from "./materials.js";
 import { Particles } from "./particles.js";
@@ -108,6 +109,7 @@ export function createStage({
   const resizeFns = [];
   const pins = [];
   const hits = new Map(); // Object3D -> handlers
+  let camMove = null; // running setView tween
   let width = 1;
   let height = 1;
 
@@ -185,10 +187,12 @@ export function createStage({
     if (!hits.size) return null;
     raycaster.setFromCamera(pointer, cam);
     const list = raycaster.intersectObjects(
-      [...hits.keys()].filter((o) => o.visible !== false),
+      [...hits.keys()].filter((o) => isShown(o)),
       true,
     );
     for (const h of list) {
+      // three.js raycasts hidden children too: skip anything not rendered
+      if (!isShown(h.object)) continue;
       const root = hitRoot(h.object);
       if (root && hits.get(root).enabled !== false) return root;
     }
@@ -317,6 +321,9 @@ export function createStage({
     for (const p of pins) placePin(p);
   }
 
+  // Pins are positioned with the CSS `translate` property (not `transform`),
+  // so a press effect like `:active { scale: 0.94 }` or `transform: scale()`
+  // on the pinned element scales it in place instead of sliding it away.
   function placePin(p) {
     p.obj.updateWorldMatrix(true, false);
     v3.copy(p.offset).applyMatrix4(p.obj.matrixWorld);
@@ -324,13 +331,31 @@ export function createStage({
     const behind = v3.z > 1;
     const x = (v3.x * 0.5 + 0.5) * width;
     const y = (-v3.y * 0.5 + 0.5) * height;
-    p.el.classList.toggle("kit-hidden", behind || p.hidden);
+    const hidden =
+      behind || p.hidden || (p.followVisible && !isShown(p.obj));
+    p.el.classList.toggle("kit-hidden", hidden);
+    p.x = x;
+    p.y = y;
+    if (p.clamp !== false && p.w) {
+      const c = clampPin({
+        x,
+        y,
+        w: p.w,
+        h: p.h,
+        align: p.align,
+        width,
+        height,
+        margin: p.clamp,
+      });
+      p.el.style.translate = `${c.left.toFixed(1)}px ${c.top.toFixed(1)}px`;
+      const tail = `${c.tail.toFixed(1)}px`;
+      if (p.tail !== tail) p.el.style.setProperty("--kit-tail-x", (p.tail = tail));
+      return;
+    }
     const ax = p.align === "left" ? "0%" : "-50%";
     const ay =
       p.align === "bottom" ? "-100%" : p.align === "top" ? "0%" : "-50%";
-    p.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(${ax}, ${ay})`;
-    p.x = x;
-    p.y = y;
+    p.el.style.translate = `calc(${x.toFixed(1)}px + ${ax}) calc(${y.toFixed(1)}px + ${ay})`;
   }
 
   const setRunning = (on) => {
@@ -389,8 +414,13 @@ export function createStage({
     // Tween a number: stage.tween({ from, to, ms, ease, onUpdate, onDone }).
     tween: (opts) => tweens.add(opts),
 
-    // Camera goal. Instant, or animated over `ms`.
+    // Camera goal. Instant, or animated over `ms`. A new setView/fit/fitPoints
+    // cancels a move still running (the newest move always wins). Returns a
+    // Promise (true when the move finished, false when cancelled) that also
+    // has `cancel()`.
     setView({ position, target }, ms = 0, easeName = "inOutCubic") {
+      camMove?.cancel();
+      camMove = null;
       const p0 = view.position.clone();
       const t0 = view.target.clone();
       const p1 = position ? new THREE.Vector3(...position) : p0.clone();
@@ -398,16 +428,19 @@ export function createStage({
       if (!ms || reduced) {
         view.position.copy(p1);
         view.target.copy(t1);
-        return Promise.resolve(true);
+        return Object.assign(Promise.resolve(true), { cancel() {} });
       }
-      return tweens.add({
+      const move = tweens.add({
         ms,
         ease: easeName,
         onUpdate: (k) => {
           view.position.lerpVectors(p0, p1, k);
           view.target.lerpVectors(t0, t1, k);
         },
-      }).done;
+      });
+      camMove = move;
+      move.done.then(() => camMove === move && (camMove = null));
+      return Object.assign(move.done, { cancel: move.cancel });
     },
     // Frame a width×height area (world units) for the current aspect.
     // Call it inside onResize so phones and laptops both see everything.
@@ -433,6 +466,34 @@ export function createStage({
         margin,
       });
       return stage.setView(f, ms);
+    },
+    // Frame world points ([x, y, z]) exactly, perspective included, inside the
+    // part of the stage the HUD leaves free. Use Kit.boxPoints / ellipsePoints
+    // to describe the area. Same return value as setView.
+    //   stage.fitPoints(Kit.boxPoints([-3, 0, -2], [3, 1, 2]), { elevation: 50, insets: { top: 90 } })
+    fitPoints(
+      points,
+      { elevation = 55, azimuth = 0, margin = 1.04, insets, minFree } = {},
+      ms = 0,
+      easeName,
+    ) {
+      const f = fitPoints({
+        points,
+        elevation,
+        azimuth,
+        margin,
+        insets,
+        minFree,
+        fov: cam.fov,
+        viewW: width,
+        viewH: height,
+      });
+      return stage.setView(f, ms, easeName);
+    },
+    // Re-run every onResize handler now (e.g. after the HUD changed height
+    // because the language changed).
+    refit() {
+      resizeFns.forEach((fn) => fn(width, height, cam.aspect));
     },
     get view() {
       return view;
@@ -492,13 +553,17 @@ export function createStage({
         });
         b.addEventListener("focus", () => setHover(obj));
         b.addEventListener("blur", () => setHover(null));
-        pin = stage.pin(b, obj, { offset: hitOffset });
+        pin = stage.pin(b, obj, { offset: hitOffset, followVisible: true });
         h.button = b;
         h.setLabel = setLabel;
       }
       return {
         button: h.button,
         setBase: () => h.baseScale.copy(obj.scale),
+        // Press-and-bounce by code (e.g. when a key answers): same as a tap's squish.
+        kick: (v = -6) => {
+          if (squish !== false) h.spring.kick(v);
+        },
         refreshLabel: () => h.setLabel?.(),
         set enabled(v) {
           h.enabled = v;
@@ -512,8 +577,23 @@ export function createStage({
     },
 
     // Pin an HTML element to a 3D point (object + local offset).
-    //   align: "center" | "bottom" (element sits above the point) | "top"
-    pin(el, obj, { offset = [0, 0, 0], align = "center" } = {}) {
+    //   align: "center" | "bottom" (element sits above the point) | "top" | "left"
+    //   clamp: px margin that keeps the element fully inside the stage (false =
+    //     off, the default). Clamped pins get `--kit-tail-x`: how far the anchor
+    //     is from their centre, so a speech-bubble tail can keep pointing at it.
+    //   followVisible: hide the element while the object (or a parent) is hidden.
+    // Press effects: scale the element with `scale` or `transform` freely; the
+    // pin itself only uses the `translate` property.
+    pin(
+      el,
+      obj,
+      {
+        offset = [0, 0, 0],
+        align = "center",
+        clamp = false,
+        followVisible = false,
+      } = {},
+    ) {
       el.classList.add("kit-pin");
       if (!el.isConnected) overlay.appendChild(el);
       const p = {
@@ -522,7 +602,22 @@ export function createStage({
         offset: new THREE.Vector3(...offset),
         align,
         hidden: false,
+        clamp: clamp === true ? 10 : clamp,
+        followVisible,
+        w: 0,
+        h: 0,
       };
+      let ro = null;
+      if (p.clamp !== false) {
+        // measure with a ResizeObserver, never in the frame loop
+        const measure = () => {
+          p.w = el.offsetWidth;
+          p.h = el.offsetHeight;
+        };
+        ro = new ResizeObserver(measure);
+        ro.observe(el);
+        measure();
+      }
       pins.push(p);
       placePin(p);
       return {
@@ -532,8 +627,16 @@ export function createStage({
         },
         setOffset: (o) => p.offset.set(...o),
         setAlign: (a) => (p.align = a),
+        get x() {
+          return p.x;
+        },
+        get y() {
+          return p.y;
+        },
         remove() {
-          pins.splice(pins.indexOf(p), 1);
+          const i = pins.indexOf(p);
+          if (i >= 0) pins.splice(i, 1);
+          ro?.disconnect();
           el.remove();
         },
       };
@@ -569,6 +672,10 @@ export function createStage({
           ? { ...opts, count: Math.ceil((opts?.count || 26) / 3), speed: 2 }
           : opts,
       );
+    },
+    // Remove every burst and confetti bit still flying (e.g. on a screen change).
+    clearBursts() {
+      particles.clear();
     },
     confetti(opts = {}) {
       if (reduced) return;

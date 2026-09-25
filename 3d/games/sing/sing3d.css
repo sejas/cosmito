@@ -25,14 +25,11 @@ html.kit-no3d body #resultsPanel, .kit-no3d .song-list { display: none !importan
   font: inherit; color: var(--ink); text-align: center; line-height: 1.15;
   border-color: color-mix(in srgb, var(--c) 60%, #fff);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--c) 40%, transparent), var(--kit-inner);
-  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.2s;
+  transition: scale 0.15s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.2s;
 }
 .song-label:hover, .song-label:focus-visible { background: var(--kit-glass-strong); }
 .song-label:focus-visible { outline: 4px solid #fff; box-shadow: 0 0 0 8px rgba(255, 92, 154, 0.5); }
-/* Press feedback on the contents: `scale` on the pinned button itself composes
-   with its translate and makes it jump away from the finger (the click is lost). */
-.song-label > span { transition: transform 0.15s cubic-bezier(0.3, 1.6, 0.5, 1); }
-.song-label:active > span { transform: scale(0.92); }
+.song-label:active { scale: 0.92; }
 .sl-title { font-weight: 700; font-size: 16px; }
 .sl-level { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
 

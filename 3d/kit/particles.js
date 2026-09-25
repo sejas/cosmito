@@ -167,6 +167,16 @@ export class Particles {
     p.mesh.instanceColor.needsUpdate = true;
   }
 
+  // Drop every live bit at once (screen changes, restarts).
+  clear() {
+    const zero = new THREE.Matrix4().makeScale(0, 0, 0);
+    for (const p of Object.values(this.pools)) {
+      for (const b of p.bits) p.mesh.setMatrixAt(b.idx, zero);
+      p.bits = [];
+      p.mesh.instanceMatrix.needsUpdate = true;
+    }
+  }
+
   update(dt) {
     const m = new THREE.Matrix4();
     const q = new THREE.Quaternion();

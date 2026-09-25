@@ -25,9 +25,10 @@ html.has-3d, html.has-3d body { overflow: hidden; height: 100%; }
   font: inherit; color: var(--ink); text-align: center; line-height: 1.15;
   border-color: color-mix(in srgb, var(--c) 55%, #fff);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--c) 35%, transparent), var(--kit-inner);
-  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+  transition: scale 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 .portal-label:hover, .portal-label:focus-visible { background: var(--kit-glass-strong); }
+/* Safe on a pinned element: the kit pins with `translate`, so this scales in place. */
 .portal-label:active { scale: 0.94; }
 .pl-title { font-weight: 700; font-size: 16px; }
 .pl-meta { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; color: var(--ink-soft); }

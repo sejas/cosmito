@@ -170,23 +170,6 @@ function start() {
   const buddy = Kit.buddyMascot(stage, "pipo");
   const walker = createWalker(stage, buddy);
   stage.scene.add(walker.root);
-  // Keep the speech bubble on screen (the kit pins it centred over the head).
-  const headV = new THREE.Vector3();
-  stage.onFrame(() => {
-    const el = buddy.bubbleEl;
-    if (!el) return;
-    if (!el.classList.contains("show")) {
-      if (el.style.translate) el.style.translate = "";
-      return;
-    }
-    const sp = stage.toScreen(buddy.anchor.getWorldPosition(headV));
-    const half = el.offsetWidth / 2;
-    const pad = 10;
-    let dx = 0;
-    if (sp.x - half < pad) dx = pad - (sp.x - half);
-    else if (sp.x + half > innerWidth - pad) dx = innerWidth - pad - (sp.x + half);
-    el.style.translate = `${Math.round(dx)}px 0`;
-  });
   const say = (text, ms = 3000) => {
     buddy.say(text, ms);
     speak(text);
@@ -247,10 +230,6 @@ function start() {
     },
   });
 
-  // Drop leftover confetti/bursts when the scene changes (kit has no clear()).
-  const clearParticles = () => {
-    for (const p of Object.values(stage.particles.pools || {})) for (const b of p.bits) b.age = b.life;
-  };
   const fade = async (on) => {
     $("#fade").classList.toggle("on", on);
     await wait(reduced() ? 60 : 300);
@@ -370,32 +349,9 @@ function start() {
     const tall = innerHeight > innerWidth * 1.2;
     return fitPoints({ ...base, points, elevation: tall ? 60 : 55, margin: 1.03 });
   }
-  // Camera moves: a newer move always wins over one still running (the
-  // kit's setView tweens can't be cancelled, so we drive it ourselves).
-  let camToken = 0;
-  function camTo(view, ms = 0, ease = "inOutCubic") {
-    const my = ++camToken;
-    if (!ms || reduced()) return stage.setView(view);
-    const p0 = stage.view.position.clone();
-    const t0 = stage.view.target.clone();
-    const p1 = new THREE.Vector3(...view.position);
-    const t1 = new THREE.Vector3(...view.target);
-    const p = new THREE.Vector3();
-    const q = new THREE.Vector3();
-    return stage.tween({
-      ms,
-      ease,
-      onUpdate: (k) => {
-        if (my !== camToken) return;
-        p.lerpVectors(p0, p1, k);
-        q.lerpVectors(t0, t1, k);
-        stage.setView({ position: p.toArray(), target: q.toArray() });
-      },
-    }).done;
-  }
   function reframe(ms = 0) {
     if (mode === "play" && !board) return Promise.resolve();
-    return camTo(viewFor(), ms);
+    return stage.setView(viewFor(), ms);
   }
   stage.onResize((w, h, aspect) => {
     map.layout(aspect >= 1.1);
@@ -462,7 +418,7 @@ function start() {
     sfx("level");
     const p = map.stoneTop(i);
     stage.burst(p.clone().setY(p.y + 0.4), { shape: "star", count: 18 });
-    await camTo(
+    await stage.setView(
       { position: [p.x, p.y + 2.2, p.z + 2.4], target: [p.x, p.y + 0.3, p.z] },
       reduced() ? 0 : 520,
       "inCubic",
@@ -483,7 +439,7 @@ function start() {
     await fade(true);
     standing = li;
     focusWorld = LEVELS[standing].world;
-    clearParticles();
+    stage.clearBursts();
     setMode("map");
     renderMap();
     placeOnStone(standing);
@@ -512,7 +468,7 @@ function start() {
     hintOn = !!L.tutor;
     failPath = null;
     board?.dispose();
-    clearParticles();
+    stage.clearBursts();
     board = createBoard(stage, {
       world,
       level: L,
@@ -532,12 +488,12 @@ function start() {
     // swoop in from above
     const f = viewFor();
     if (!reduced()) {
-      camTo({
+      stage.setView({
         position: [f.position[0], f.position[1] + 5, f.position[2] + 4],
         target: f.target,
       });
-      camTo(f, 900, "outCubic");
-    } else camTo(f);
+      stage.setView(f, 900, "outCubic");
+    } else stage.setView(f);
     const tip = L.tip ? t(`tips.${L.tip}`, treatName(1)) : null;
     const lvl = L;
     setTimeout(() => {

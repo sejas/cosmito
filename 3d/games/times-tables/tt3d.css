@@ -114,9 +114,6 @@ body { background: linear-gradient(#6fb8ff, #bfe6ff 55%, #ffe3f1); }
 .tt-badge img { width: 18px; height: 18px; }
 .tt-actions { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 
-/* Speech bubble kept on screen by tt3d.js: its tail follows the buddy. */
-.kit-bubble::after { left: calc(50% + var(--tt-tail, 0px)); }
-
 /* Jar count chip pinned in 3D */
 .tt-jar-chip { padding: 2px 12px; border-radius: 99px; font-weight: 700; font-size: 17px; white-space: nowrap; pointer-events: none !important; }
 .tt-jar-chip img { width: 18px; height: 18px; vertical-align: -3px; }

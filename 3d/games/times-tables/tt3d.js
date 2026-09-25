@@ -179,28 +179,6 @@ function run(stage) {
   jarChip.setAttribute("aria-hidden", "true");
   const jarPin = stage.pin(jarChip, jarRig, { offset: [0, 1.95, 0], align: "bottom" });
 
-  // Keep the buddy's speech bubble on screen (the kit centres it on the head,
-  // so near an edge it would be cut off): shift it with CSS `translate`, and
-  // move its tail the other way so it still points at the buddy.
-  const head = new THREE.Vector3();
-  stage.onFrame(() => {
-    const el = buddy.bubbleEl;
-    if (!el || !el.classList.contains("show")) return;
-    buddy.anchor.getWorldPosition(head);
-    const p = stage.toScreen(head);
-    const w = el.offsetWidth;
-    const W = stage.size.width;
-    let dx = 0;
-    if (p.x - w / 2 < 8) dx = 8 - (p.x - w / 2);
-    else if (p.x + w / 2 > W - 8) dx = W - 8 - (p.x + w / 2);
-    dx = Math.round(dx);
-    if (el.dataset.dx !== String(dx)) {
-      el.dataset.dx = dx;
-      el.style.translate = `${dx}px 0`;
-      el.style.setProperty("--tt-tail", `${Math.max(-w / 2 + 24, Math.min(w / 2 - 24, -dx))}px`);
-    }
-  });
-
   // ---- screens' 3D pieces
   const planets = createPlanets(stage, {
     label: (n, s) => t("tableAria", n, s),
