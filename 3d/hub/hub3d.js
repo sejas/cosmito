@@ -1,10 +1,10 @@
 // The 3D hub: a floating island where the buddy lives, one portal per game.
-/* global GAMES, KidsI18n, KidsStore, KidsAudio, Mascots */
+/* global GAMES, HUB_RANKS, hubRank, KidsI18n, KidsStore, KidsAudio, Mascots */
 import * as THREE from "three";
 import * as Kit from "../kit/kit.js";
 import { createIsland } from "./island.js";
 import { createPortal } from "./portal.js";
-import { layoutHub, rankFor } from "./logic.js";
+import { layoutHub } from "./logic.js";
 import { READY_3D } from "../games/ready.js";
 
 const DICT = {
@@ -23,15 +23,7 @@ const DICT = {
       `${title} is still being built in 3D. Want to play the classic version now?`,
     playClassic: "▶ Play classic",
     back: "Stay here",
-    ranks: [
-      "New Explorer 🧭",
-      "Curious Cub 🐾",
-      "Bright Spark ✨",
-      "Super Learner 🚀",
-      "Legend 👑",
-    ],
-    next: (n, rank) => `${n} more ⭐ to become ${rank}`,
-    maxed: "You collected every star! 🏆",
+    ...HUB_RANKS.en, // ranks, next, maxed: shared with the 2D hub (hub/games.js)
     welcome: "Welcome to our island! Tap a portal! ✨",
     buddyLabel: (name) => `${name}, your buddy. Tap to say hi`,
     letsGo: "Let's go! 🚀",
@@ -52,15 +44,7 @@ const DICT = {
       `${title} todavía se está construyendo en 3D. ¿Quieres jugar a la versión clásica?`,
     playClassic: "▶ Jugar al clásico",
     back: "Quedarme aquí",
-    ranks: [
-      "Explorador novato 🧭",
-      "Cachorro curioso 🐾",
-      "Chispa brillante ✨",
-      "Súper aprendiz 🚀",
-      "Leyenda 👑",
-    ],
-    next: (n, rank) => `${n} ⭐ más para ser ${rank}`,
-    maxed: "¡Tienes todas las estrellas! 🏆",
+    ...HUB_RANKS.es,
     welcome: "¡Bienvenido a nuestra isla! ¡Toca un portal! ✨",
     buddyLabel: (name) => `${name}, tu amigo. Tócalo para saludar`,
     letsGo: "¡Vamos! 🚀",
@@ -112,7 +96,7 @@ function renderTrophy() {
   );
   const max = games.reduce((s, g) => s + g.maxStars, 0);
   const ranks = t("ranks");
-  const r = rankFor(have, max, ranks.length);
+  const r = hubRank(have, max, ranks.length);
   $("#rank").textContent = ranks[r.rank];
   $("#starCount").textContent = `⭐ ${have} / ${max}`;
   $("#trophyBar").set(have, max);
@@ -317,6 +301,9 @@ if (stage) {
   Mascots.onBuddyChange(render);
 }
 
-KidsI18n.onChange(render);
+KidsI18n.onChange(() => {
+  render();
+  stage?.refit(); // texts changed: the HUD may be taller or shorter now
+});
 render();
 games.forEach((g, i) => portals[i]?.setReady(g.ready));

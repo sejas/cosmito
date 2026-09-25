@@ -167,9 +167,15 @@ export function dialog({
   });
 }
 
-// Small glass toast at the bottom. Returns a function that hides it.
+// Small glass toast at the top, just under the HUD (`.kit-hud`, or any element
+// marked `data-kit-hud`), so it never hides a game's bottom buttons. Returns a
+// function that hides it.
 export function toast(text, { ms = 5000, action } = {}) {
   const t = el("div", "kit-glass kit-toast");
+  const hud = document.querySelector(".kit-hud, [data-kit-hud]");
+  const below = hud?.getBoundingClientRect().bottom;
+  if (below > 0 && below < innerHeight / 3)
+    t.style.setProperty("--kit-toast-top", `${Math.round(below + 8)}px`);
   t.setAttribute("role", "status");
   t.appendChild(el("span", "", text));
   if (action) {

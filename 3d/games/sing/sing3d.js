@@ -731,13 +731,6 @@ async function endSong() {
 
 // ---------- build the scene ----------
 const pins = [];
-// Kit.label() redraws when the web font arrives, and a wider canvas then fails
-// to upload (GL_INVALID_VALUE). Build the labelled things once Fredoka is in.
-if (stage)
-  await Promise.race([
-    document.fonts?.ready,
-    new Promise((r) => setTimeout(r, 2000)),
-  ]);
 if (stage) {
   document.documentElement.classList.add("has-3d");
   set = createSet(stage);
@@ -756,9 +749,8 @@ if (stage) {
     cdLabel[k] = Kit.label(k, { size: 2.1, color: "#ff5c9a", outline: "#ffffff" });
   cdRing = new THREE.Mesh(
     new THREE.TorusGeometry(0.9, 0.07, 8, 48),
-    Kit.flat("#ff8fb8", { opacity: 0.9 }).clone(),
+    Kit.flat("#ff8fb8", { opacity: 0.9, unique: true }),
   );
-  cdRing.material.transparent = true;
   cdRing.userData.t = 9;
   countdown.add(...Object.values(cdLabel), cdRing);
   countdown.position.set(0, 2.5, 0.6);

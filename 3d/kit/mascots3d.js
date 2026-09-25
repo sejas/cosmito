@@ -536,6 +536,7 @@ export class Mascot3D {
       this.bubbleEl.appendChild(this.bubbleText);
       this.bubblePin = stage.pin(this.bubbleEl, this.anchor, {
         align: "bottom",
+        clamp: 10, // stays on screen; the tail keeps pointing at the head
       });
     }
     if (followBuddy && MASCOTS()) {

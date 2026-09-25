@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { layoutHub, rankFor } from "./logic.js";
+import { createRequire } from "node:module";
+import { layoutHub } from "./logic.js";
+
+const { GAMES, HUB_RANKS, hubRank } = createRequire(import.meta.url)(
+  "../../hub/games.js",
+);
+const rankFor = hubRank;
 
 test("wide layout: symmetric arc behind the buddy", () => {
   const l = layoutHub(6, 16 / 9);
@@ -42,9 +48,18 @@ test("portals never overlap", () => {
   }
 });
 
-test("rankFor matches the 2D hub maths", () => {
+test("hubRank (shared by both hubs) maths", () => {
   assert.deepEqual(rankFor(0, 100, 5), { rank: 0, toNext: 25, last: false });
   assert.deepEqual(rankFor(30, 100, 5), { rank: 1, toNext: 20, last: false });
   assert.deepEqual(rankFor(100, 100, 5), { rank: 4, toNext: 0, last: true });
   assert.equal(rankFor(0, 0, 5).last, true);
+});
+
+test("both languages have the same number of ranks, for the real catalogue", () => {
+  assert.equal(HUB_RANKS.en.ranks.length, HUB_RANKS.es.ranks.length);
+  const max = GAMES.reduce((s, g) => s + g.maxStars, 0);
+  const n = HUB_RANKS.en.ranks.length;
+  assert.equal(rankFor(max, max, n).last, true);
+  assert.equal(rankFor(max - 1, max, n).rank, n - 2);
+  assert.match(HUB_RANKS.es.next(3, "Leyenda 👑"), /3 ⭐ más/);
 });

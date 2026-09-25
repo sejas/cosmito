@@ -8,10 +8,10 @@ translated, private by default, works on a phone, respects reduced motion.
 ```
 3d/
   index.html        the 3D hub: a floating island, one portal per game
-  hub/              hub code (island, portals, layout logic + tests)
+  hub/              hub code (island, portals, layout logic + tests); ranks come from ../hub/games.js, shared with the 2D hub
   kit/              the shared 3D kit (import kit.js)
     demo.html       live reference: every mascot in every mood, treats, particles, glass UI
-  games/            one folder per 3D game: games/<id>/index.html
+  games/            one flat folder per 3D game: games/<id>/index.html + <id>3d.js, logic.js…
     ready.js        list of games that have a 3D version (the hub reads it)
 vendor/three/       three.js r186, vendored (see VERSION.md)
 ```
@@ -53,15 +53,16 @@ Progress, stars, buddy, language and mute are shared with the 2D games (same `Ki
   <script src="../../../shared/mascot.js"></script>
   <script src="../../../shared/mascots/pipo.js"></script>
   <script src="../../../shared/mascots/bollo.js"></script>
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
 ```
 
 ```js
-// js/app.js
+// 3d/games/<id>/app.js — game folders are flat (no js/ subfolder), so the kit
+// is two levels up: import it from "../../kit/kit.js".
 import * as THREE from "three";
-import * as Kit from "../../../kit/kit.js";
+import * as Kit from "../../kit/kit.js";
 
 const stage = Kit.createStage({ fallback: "../../../games/sing/" }); // 2D version of THIS game
 Kit.ui.buddyChip(document.querySelector("#btnBuddy"), "pipo");
@@ -105,16 +106,19 @@ scripts: modules can use them by bare name, but **`window.KidsI18n` is `undefine
 `stage` has: `scene`, `camera`, `renderer`, `overlay` (HTML layer), `lights {hemi, key, fill}`, `stats {fps, level, drawCalls, triangles}`, `quality` (current settings), `reducedMotion`, `time`, `size`, `pointer`.
 
 - `onFrame((dt, t) => …)` → unsubscribe. `onResize((w, h, aspect) => …)` runs now and on every resize.
-- `fit({ center, width, height, elevation = 20, azimuth = 0, margin = 1.1 }, ms?)` frames an area for any aspect. Call it in `onResize`.
-- `setView({ position, target }, ms?, ease?)` → Promise. Camera moves are instant with reduced motion.
+- `fit({ center, width, height, elevation = 20, azimuth = 0, margin = 1.1 }, ms?)` frames an area for any aspect, treating it as a flat card facing the camera. Call it in `onResize`.
+- `fitPoints(points, { elevation = 55, azimuth = 0, margin = 1.04, insets, minFree = 0.3 }, ms?, ease?)` frames world points (`[x, y, z]`) exactly, perspective included, so the near row of a deep board is never clipped. `insets` = CSS px to keep free at each edge (`{ top, bottom, left, right }`, e.g. your HUD panels); the points are centred in the rest. Describe the area with `Kit.boxPoints(min, max)` (8 corners) or `Kit.ellipsePoints(center, rx, rz, ys, n)` (islands, round arenas). The pure `Kit.fitPoints({ points, fov, viewW, viewH, insets, … })` returns the view without moving the camera.
+- `setView({ position, target }, ms?, ease?)` → Promise (`true` when it arrives, `false` when cancelled) with a `cancel()` method. **The newest camera move wins**: `setView`, `fit` and `fitPoints` cancel any move still running. Camera moves are instant with reduced motion.
+- `refit()` re-runs every `onResize` handler now, e.g. after your HUD changed height (the language changed, a panel opened).
 - `tween({ from, to, ms, delay, ease, onUpdate(v, k), onDone })` → `{ done, cancel() }`. Eases: `linear, inQuad, outQuad, inOutQuad, outCubic, inOutCubic, outBack, outElastic, outBounce`.
-- `tap(object, { onTap, onHover(on), label, squish = true, hitRadius, hitOffset })` → `{ button, setBase(), refreshLabel(), enabled, remove() }`. Press squish + release bounce are automatic. **Always pass `label`** (string or function, re-read on language change): it creates an invisible focusable `<button>` pinned on the object for keyboard and screen readers. `hitRadius` adds an invisible sphere so small things are easy to hit. Call `setBase()` after changing the object's scale yourself.
-- `pin(element, object, { offset, align: "center" | "bottom" | "top" })` → `{ setOffset, setAlign, hidden, remove() }`: keeps an HTML element glued to a 3D point.
+- `tap(object, { onTap, onHover(on), label, squish = true, hitRadius, hitOffset })` → `{ button, setBase(), refreshLabel(), kick(v = -6), enabled, remove() }`. Press squish + release bounce are automatic; `kick()` plays the same squish from code (e.g. when a key press answers). **Always pass `label`** (string or function, re-read on language change): it creates an invisible focusable `<button>` pinned on the object for keyboard and screen readers. `hitRadius` adds an invisible sphere so small things are easy to hit. Call `setBase()` after changing the object's scale yourself.
+  **Hidden things aren't tappable**: an object is only picked when it and every parent are `.visible`, and its keyboard button hides with it. Hide a group to switch off everything in it; `enabled = false` is for things that stay visible.
+- `pin(element, object, { offset, align: "center" | "bottom" | "top" | "left", clamp = false, followVisible = false })` → `{ setOffset, setAlign, hidden, x, y, remove() }`: keeps an HTML element glued to a 3D point. `clamp: 10` keeps it fully on screen with a 10 px margin and sets `--kit-tail-x` on it (px from its centre to the anchor, so a tail can point at it; mascot speech bubbles do this). `followVisible` hides it while the object or a parent is hidden. Pins move with the CSS `translate` property, so press effects on a pinned element are safe: `.my-label:active { scale: 0.94 }` (or `transform: scale()`) shrinks it in place and the click still lands. Don't set `translate` on a pinned element yourself.
 - `toScreen(vec3)`, `pointerOnPlane(y)`, `pointerActive`.
-- `burst(position, { shape: "star" | "confetti" | "dot", count, colors, speed, up, spread, life, size })`, `confetti()`. Counts shrink on low quality and with reduced motion.
+- `burst(position, { shape: "star" | "confetti" | "dot", count, colors, speed, up, spread, life, size })`, `confetti()`. Counts shrink on low quality and with reduced motion. `clearBursts()` removes every bit still flying (call it when you change screens, so confetti doesn't follow the player).
 - `pause()`, `resume()`, `dispose()`. The loop already pauses when the tab is hidden or the stage is off-screen.
 
-Adaptive quality: level 2 (DPR ≤ 2, shadows), 1 (DPR ≤ 1.5), 0 (DPR 1, fewer particles, no glass blur: adds `html.kit-lowfx`). It starts from device hints, drops a level after 2 s below 45 fps, climbs back once after 8 s above 57 fps, and if even level 0 stays under 22 fps it shows a toast offering the classic version.
+Adaptive quality: level 2 (DPR ≤ 2, shadows), 1 (DPR ≤ 1.5), 0 (DPR 1, fewer particles, no glass blur: adds `html.kit-lowfx`). It starts from device hints, drops a level after 2 s below 45 fps, climbs back once after 8 s above 57 fps, and if even level 0 stays under 22 fps it shows a toast offering the classic version (at the top, under the HUD, so it never covers your bottom panels; dialogs sit above it).
 
 ### Mascots (same mood API as 2D)
 
@@ -143,19 +147,22 @@ New mascot? Register its 2D version as usual, then `Kit.register3D(id, () => rig
 
 `Kit.treat(mascotIdOrDef)` → the buddy's favourite food (Pipo 🌽 corn cob, Bollo red bell pepper, anyone else a star), `Kit.corn()`, `Kit.pepper()`, `Kit.star3D(color)`, `Kit.registerTreat(id, factory)`. Each is ~1 unit, centred.
 
+Lots of treats (a jar, a 10 × 10 array, treat rain): `const arr = new Kit.TreatInstances(stage, max)`, `arr.setTreat(id)`, `stage.scene.add(arr.group)`, then `arr.set(i, { x, y, z, s, rx, ry, rz })`, `arr.count = n`, `arr.flush()`. Every part of the treat becomes one InstancedMesh (a corn array is 3 draw calls; big arrays use a low-poly version).
+
 ### Materials, environment, text
 
-- `Kit.toon(color, { rim, rimColor, emissive, vertexColors })`: the house style, a soft cel ramp plus a fresnel rim (cached, so reuse is free). `Kit.candy(color)` glossier; `Kit.flat(color, { opacity, additive })` unlit.
+- `Kit.toon(color, { rim, rimColor, emissive, vertexColors, unique })`: the house style, a soft cel ramp plus a fresnel rim. `Kit.candy(color, emissive, { unique })` glossier; `Kit.flat(color, { opacity, additive, unique })` unlit.
+  **Caching rule**: `toon`, `candy` and `flat` return one *shared* material per set of options, so reuse is free, but never change a shared one (`opacity`, `color`, `visible`…): every object using it changes too. To animate a material, ask for your own with `{ unique: true }`.
 - `Kit.holo(color, { opacity, swirl })`: animated holographic surface (portals, pads, screens).
-- `Kit.label(text, { size, color, bg, outline })`: text/emoji sprite (numbers, icons); `sprite.userData.setText(t)` to change it.
+- `Kit.label(text, { size, color, bg, outline })`: text/emoji sprite (numbers, icons); `sprite.userData.setText(t)` to change it, as often as you like. It redraws itself when the web font arrives and swaps in a new GPU texture whenever the text changes size, so no need to wait for fonts before building labels.
 - `Kit.blobShadow(radius)`: cheap soft contact shadow.
 - `Kit.createClouds(scene, opts)`, `Kit.createSparkles(scene, opts)`, `Kit.createSky(scene, opts)`.
-- `Kit.Spring`, `Kit.damp`, `Kit.lerp`, `Kit.clamp`, `Kit.ease`, `Kit.frame`/`fitDistance`: pure helpers.
+- `Kit.Spring`, `Kit.damp`, `Kit.lerp`, `Kit.clamp`, `Kit.ease`, `Kit.frame`/`fitDistance`, `Kit.fitPoints`/`boxPoints`/`ellipsePoints`, `Kit.clampPin`, `Kit.isShown(object)`: pure helpers (unit-tested in `kit/kit.test.js`).
 
 ### Glass UI (`kit/ui.css` + `Kit.ui`)
 
 Classes: `kit-hud` (fixed top bar for chips), `kit-glass` (frosted panel), `kit-panel`, `kit-chip` (small pill, 44 px tall), `kit-btn` (+ `primary`, `kit-round`), `kit-card` + `Kit.ui.tilt(el)` (tilts towards the pointer with a glare), `kit-holo-edge` (animated rainbow border), `kit-badge`, `kit-bar` (`Kit.ui.bar(v, max)` → `.set(v, max)`).
-Helpers: `Kit.ui.langChip(btn)`, `buddyChip(btn, fallbackId)`, `soundChip(btn)`, `dialog({ icon, title, body, actions: [{ text, href?, onClick?, primary? }] })` → Promise<index> (focus trap, Escape closes), `toast(text, { ms, action })`, `bubble()`, `fallback(container, href)`.
+Helpers: `Kit.ui.langChip(btn)`, `buddyChip(btn, fallbackId)`, `soundChip(btn)`, `dialog({ icon, title, body, actions: [{ text, href?, onClick?, primary? }] })` → Promise<index> (focus trap, Escape closes), `toast(text, { ms, action })` (drops in under the `.kit-hud`; mark a custom header with `data-kit-hud`), `bubble()`, `fallback(container, href)`.
 Kit texts live in `Kit.KIT_DICT` (en, es); `Kit.kt(key)` translates them.
 
 ## Design language

@@ -3,7 +3,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ease, clamp, damp, Spring, Tweens } from "./motion.js";
 import { QualityGovernor, settingsFor, initialLevel } from "./quality.js";
-import { fitDistance, orbitPosition, frame } from "./view.js";
+import {
+  fitDistance,
+  orbitPosition,
+  frame,
+  fitPoints,
+  boxPoints,
+  ellipsePoints,
+} from "./view.js";
+import { clampPin, isShown } from "./screen.js";
 
 test("fitDistance fits the limiting side", () => {
   // Square view, fov 90°: half-height 1 at distance 1.
@@ -150,4 +158,116 @@ test("governor ignores tab-switch gaps", () => {
   g.frame(5);
   run(g, 60, 3);
   assert.equal(g.level, 2);
+});
+
+// Project like a perspective camera looking from view.position to view.target.
+function project(p, view, fov, aspect) {
+  const f = [0, 1, 2].map((i) => view.target[i] - view.position[i]);
+  const fl = Math.hypot(...f);
+  const fw = f.map((x) => x / fl);
+  let r = [-fw[2], 0, fw[0]];
+  const rl = Math.hypot(...r);
+  r = r.map((x) => x / rl);
+  const u = [
+    r[1] * fw[2] - r[2] * fw[1],
+    r[2] * fw[0] - r[0] * fw[2],
+    r[0] * fw[1] - r[1] * fw[0],
+  ];
+  const v = [0, 1, 2].map((i) => p[i] - view.position[i]);
+  const z = v[0] * fw[0] + v[1] * fw[1] + v[2] * fw[2];
+  const tv = Math.tan((fov * Math.PI) / 360);
+  return [
+    (v[0] * r[0] + v[1] * r[1] + v[2] * r[2]) / (z * tv * aspect),
+    (v[0] * u[0] + v[1] * u[1] + v[2] * u[2]) / (z * tv),
+  ];
+}
+
+test("fitPoints: every point lands inside the free rect, which it fills", () => {
+  const pts = boxPoints([-3.5, -0.2, -1.5], [3.5, 1, 1.5]);
+  for (const [W, H, insets, elevation] of [
+    [390, 844, { left: 8, top: 130, right: 8, bottom: 260 }, 55],
+    [1280, 800, { left: 8, top: 120, right: 420, bottom: 8 }, 55],
+    [768, 1024, {}, 55],
+    [390, 844, { top: 100, bottom: 100 }, 20],
+  ]) {
+    const v = fitPoints({ points: pts, fov: 38, viewW: W, viewH: H, insets, elevation, margin: 1.05 });
+    const r = { left: 0, top: 0, right: 0, bottom: 0, ...insets };
+    const px = pts
+      .map((p) => project(p, v, 38, W / H))
+      .map(([x, y]) => [((x + 1) / 2) * W, ((1 - y) / 2) * H]);
+    const xs = px.map((p) => p[0]);
+    const ys = px.map((p) => p[1]);
+    assert.ok(Math.min(...xs) >= r.left - 0.5 && Math.max(...xs) <= W - r.right + 0.5, `x fits ${W}`);
+    assert.ok(Math.min(...ys) >= r.top - 0.5 && Math.max(...ys) <= H - r.bottom + 0.5, `y fits ${W}`);
+    const fillX = (Math.max(...xs) - Math.min(...xs)) / (W - r.left - r.right);
+    const fillY = (Math.max(...ys) - Math.min(...ys)) / (H - r.top - r.bottom);
+    assert.ok(Math.max(fillX, fillY) > 0.9, `fills the free space (${fillX.toFixed(2)}, ${fillY.toFixed(2)})`);
+  }
+});
+
+test("fitPoints keeps the near row in view where a flat frame clips it", () => {
+  // A deep board seen from 55°: the near edge is much closer to the camera.
+  const pts = boxPoints([-3, 0, -6], [3, 0.5, 6]);
+  const W = 1280;
+  const H = 800;
+  const flat = frame({ center: [0, 0.25, 0], width: 6, height: 12 * Math.sin((55 * Math.PI) / 180), fov: 40, aspect: W / H, elevation: 55, margin: 1 });
+  const flatY = pts.map((p) => project(p, flat, 40, W / H)[1]);
+  assert.ok(Math.min(...flatY) < -1, "the flat frame clips the near row (the bug)");
+  const exact = fitPoints({ points: pts, fov: 40, viewW: W, viewH: H, elevation: 55, margin: 1 });
+  const ndc = pts.map((p) => project(p, exact, 40, W / H));
+  assert.ok(ndc.every(([x, y]) => Math.abs(x) <= 1 + 1e-3 && Math.abs(y) <= 1 + 1e-3));
+});
+
+test("fitPoints accepts the old `rect` name for insets", () => {
+  const pts = boxPoints([-1, 0, -1], [1, 1, 1]);
+  const a = fitPoints({ points: pts, viewW: 800, viewH: 600, insets: { top: 100 } });
+  const b = fitPoints({ points: pts, viewW: 800, viewH: 600, rect: { top: 100 } });
+  assert.deepEqual(a, b);
+});
+
+test("ellipse points", () => {
+  const pts = ellipsePoints([1, 0, 2], 3, 1, [0, 1], 8);
+  assert.equal(pts.length, 16);
+  assert.ok(pts.every((p) => Math.abs(((p[0] - 1) / 3) ** 2 + (p[2] - 2) ** 2 - 1) < 1e-9));
+  assert.equal(boxPoints([0, 0, 0], [1, 1, 1]).length, 8);
+});
+
+test("clampPin keeps a bubble inside the viewport and its tail on the anchor", () => {
+  const vp = { width: 390, height: 844, margin: 10 };
+  // centred, room to spare: untouched
+  let r = clampPin({ ...vp, x: 195, y: 400, w: 200, h: 60, align: "bottom" });
+  assert.deepEqual(r, { left: 95, top: 340, tail: 0 });
+  // anchor near the left edge: pushed right, tail points back left
+  r = clampPin({ ...vp, x: 40, y: 400, w: 200, h: 60, align: "bottom" });
+  assert.equal(r.left, 10);
+  assert.equal(r.tail, 40 - 110);
+  // near the right edge
+  r = clampPin({ ...vp, x: 385, y: 400, w: 200, h: 60, align: "bottom" });
+  assert.equal(r.left + 200, 380);
+  assert.ok(r.tail > 0 && r.tail <= 100 - 22, "tail clamped to the bubble body");
+  // anchor off-screen: tail stays on the body
+  r = clampPin({ ...vp, x: -300, y: 400, w: 200, h: 60 });
+  assert.equal(r.left, 10);
+  assert.equal(r.tail, -(100 - 22));
+  // above the top edge: pushed down
+  r = clampPin({ ...vp, x: 195, y: 20, w: 200, h: 60, align: "bottom" });
+  assert.equal(r.top, 10);
+  // top align: element below the point
+  r = clampPin({ ...vp, x: 195, y: 830, w: 100, h: 40, align: "top" });
+  assert.equal(r.top, 844 - 10 - 40);
+  // wider than the viewport: centred
+  r = clampPin({ ...vp, x: 100, y: 400, w: 500, h: 60 });
+  assert.equal(r.left, (390 - 500) / 2);
+});
+
+test("isShown needs every ancestor visible", () => {
+  const root = { visible: true, parent: null };
+  const group = { visible: true, parent: root };
+  const mesh = { visible: true, parent: group };
+  assert.equal(isShown(mesh), true);
+  group.visible = false;
+  assert.equal(isShown(mesh), false, "hidden parent hides the child");
+  group.visible = true;
+  mesh.visible = false;
+  assert.equal(isShown(mesh), false);
 });

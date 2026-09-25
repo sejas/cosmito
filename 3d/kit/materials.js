@@ -26,6 +26,12 @@ export function toonRamp() {
 //   toon("#ffd23f")                      solid colour
 //   toon("#fff", { vertexColors: true }) colours painted on the geometry
 //   toon(c, { rim: 0.5, rimColor: "#fff", emissive: "#222" })
+//   toon(c, { unique: true })            a material of your own (see below)
+//
+// CACHING: toon(), flat() and candy() return one SHARED material per set of
+// options, so reuse is free. Never change a shared material (opacity, colour,
+// visible…): every object using it changes too. To animate a material, ask for
+// `{ unique: true }`: a fresh, uncached material only you hold.
 const toonCache = new Map();
 export function toon(
   color = "#ffffff",
@@ -36,6 +42,7 @@ export function toon(
     vertexColors = false,
     transparent = false,
     opacity = 1,
+    unique = false,
   } = {},
 ) {
   const key = [
@@ -47,7 +54,7 @@ export function toon(
     transparent,
     opacity,
   ].join("|");
-  if (toonCache.has(key)) return toonCache.get(key);
+  if (!unique && toonCache.has(key)) return toonCache.get(key);
   const m = new THREE.MeshToonMaterial({
     color,
     gradientMap: toonRamp(),
@@ -57,7 +64,7 @@ export function toon(
     opacity,
   });
   addRim(m, rim, rimColor);
-  toonCache.set(key, m);
+  if (!unique) toonCache.set(key, m);
   return m;
 }
 
@@ -82,13 +89,14 @@ function addRim(material, strength, color) {
 }
 
 // Unlit colour (eyes, cheeks, glowing bits): never shaded, always crisp.
+// Shared like toon(); pass { unique: true } for one you can animate.
 const flatCache = new Map();
 export function flat(
   color,
-  { opacity = 1, additive = false, depthWrite = true } = {},
+  { opacity = 1, additive = false, depthWrite = true, unique = false } = {},
 ) {
   const key = [color, opacity, additive, depthWrite].join("|");
-  if (flatCache.has(key)) return flatCache.get(key);
+  if (!unique && flatCache.has(key)) return flatCache.get(key);
   const m = new THREE.MeshBasicMaterial({
     color,
     transparent: opacity < 1 || additive,
@@ -96,13 +104,14 @@ export function flat(
     depthWrite: depthWrite && !additive,
     blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
   });
-  flatCache.set(key, m);
+  if (!unique) flatCache.set(key, m);
   return m;
 }
 
 // Glossy candy material (treats, stars): toon + strong rim + a hint of emissive.
-export const candy = (color, emissive = "#000000") =>
-  toon(color, { rim: 0.6, emissive });
+// Shared like toon(); candy(c, e, { unique: true }) for one of your own.
+export const candy = (color, emissive = "#000000", { unique = false } = {}) =>
+  toon(color, { rim: 0.6, emissive, unique });
 
 // Holographic surface: fresnel glow, drifting scan lines and a swirl. Animated
 // by the stage, which advances `uTime` on every material in `timed`.
@@ -206,7 +215,9 @@ export function blobShadow(radius = 1) {
 //   label("7 × 8", { size: 0.6, color: "#26315c", bg: "rgba(255,255,255,.8)" })
 //   label("🎤", { size: 1 })
 // `size` is the world height of the sprite. Call sprite.userData.setText(t)
-// to change it later (re-draws the canvas).
+// to change it later (re-draws the canvas). It also re-draws itself once the
+// web font has loaded. Whenever the canvas changes size the GPU texture is
+// replaced (WebGL can't grow a texture in place), so re-texting is always safe.
 export function label(
   text,
   {
@@ -221,10 +232,13 @@ export function label(
 ) {
   const canvas = document.createElement("canvas");
   const g = canvas.getContext("2d");
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
+  const makeTexture = () => {
+    const t = new THREE.CanvasTexture(canvas);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  };
   const mat = new THREE.SpriteMaterial({
-    map: tex,
+    map: makeTexture(),
     transparent: true,
     depthWrite: false,
   });
@@ -234,8 +248,16 @@ export function label(
     g.font = `${weight} ${px}px ${font}`;
     const w = Math.ceil(g.measureText(t).width + px * padding * 2);
     const h = Math.ceil(px * (1.25 + padding));
-    canvas.width = w;
-    canvas.height = h;
+    if (w !== canvas.width || h !== canvas.height) {
+      canvas.width = w;
+      canvas.height = h;
+      // Same-size uploads reuse the GPU texture; a new size needs a new one
+      // (else Chrome: "glCopySubTextureCHROMIUM: Offset overflows texture").
+      if (mat.map.version > 0) {
+        mat.map.dispose();
+        mat.map = makeTexture();
+      }
+    } else g.clearRect(0, 0, w, h);
     g.font = `${weight} ${px}px ${font}`;
     g.textAlign = "center";
     g.textBaseline = "middle";
@@ -254,7 +276,7 @@ export function label(
     }
     g.fillStyle = color;
     g.fillText(t, w / 2, h / 2 + px * 0.04);
-    tex.needsUpdate = true;
+    mat.map.needsUpdate = true;
     sprite.scale.set((size * w) / h, size, 1);
   };
   let current = String(text);

@@ -3,8 +3,6 @@
 // Used by Learn (big, all 10 rows framed) and as the hint after a wrong answer.
 import * as THREE from "three";
 import * as Kit from "../../kit/kit.js";
-import { label } from "./world.js";
-import { TreatInstances } from "./instanced.js";
 import { arrayCells, colorOf } from "./logic.js";
 
 function roundedRect(w, h, r) {
@@ -34,7 +32,7 @@ export function createBoard(
   const edgeMat = Kit.flat("#ffffff", { opacity: 0.9 });
   let plate = null;
   let edge = null;
-  const treats = new TreatInstances(stage, maxRows * maxPer, {
+  const treats = new Kit.TreatInstances(stage, maxRows * maxPer, {
     shadows: false,
   });
   content.add(treats.group);
@@ -47,7 +45,7 @@ export function createBoard(
   ghost.raycast = () => {};
   content.add(ghost);
   const labels = Array.from({ length: maxRows }, (_, r) => {
-    const l = label(String(r + 1), {
+    const l = Kit.label(String(r + 1), {
       size: 0.5,
       color: "#26315c",
       bg: "rgba(255,255,255,0.92)",

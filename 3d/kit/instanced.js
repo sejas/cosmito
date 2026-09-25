@@ -6,10 +6,10 @@
 // merged), and nested instanced parts (the corn kernels) are baked into one
 // low-poly geometry. A 10 × 10 array of corn is then 3 draw calls.
 //
-//   const arr = new TreatInstances(stage, 100);   arr.setTreat("pipo");
+//   const arr = new Kit.TreatInstances(stage, 100);   arr.setTreat("pipo");
 //   arr.set(i, { x, y, z, s, ry, rz }); arr.count = n;   // then arr.flush()
 import * as THREE from "three";
-import * as Kit from "../../kit/kit.js";
+import { treat } from "./treats.js";
 
 const tmp = new THREE.Matrix4();
 const item = new THREE.Matrix4();
@@ -87,7 +87,7 @@ const partsCache = new Map();
 export function treatParts(id, { light = false } = {}) {
   const ck = `${id}|${light}`;
   if (partsCache.has(ck)) return partsCache.get(ck);
-  const proto = Kit.treat(id);
+  const proto = treat(id);
   proto.updateMatrixWorld(true);
   const byKey = new Map();
   proto.traverse((o) => {
