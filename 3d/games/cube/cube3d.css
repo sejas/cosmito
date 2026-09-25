@@ -9,7 +9,7 @@ body { background: linear-gradient(#7cc4ff, #cdeaff 55%, #ffe1f0); min-height: 1
 .cu-head { gap: 8px; align-items: center; }
 .cu-head > .cu-home, .cu-head > .cu-back { margin-right: auto; }
 .cu-home span[aria-hidden], .cu-back span[aria-hidden] { font-size: 20px; }
-.cu-count { font-variant-numeric: tabular-nums; pointer-events: none; }
+.cu-count { align-self: center; padding: 6px 18px; border-radius: 999px; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
 
 .cu-panel { position: fixed; z-index: 5; pointer-events: none; }
 .cu-panel > * { pointer-events: auto; }

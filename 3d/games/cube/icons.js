@@ -21,7 +21,6 @@ export function isoCube(
   const polys = [];
   const quad = (face, r, c) => {
     // sticker corners in 3D, inset a little
-    const g = 1 / n;
     const inset = 0.09;
     const u0 = c + inset;
     const u1 = c + 1 - inset;
@@ -32,7 +31,6 @@ export function isoCube(
       if (face === FACE_F) return [-h + u, h - v, h];
       return [h, h - v, h - u]; // R
     };
-    void g;
     return [pt(u0, v0), pt(u1, v0), pt(u1, v1), pt(u0, v1)].map(project);
   };
   const faceOutline = (face) => {

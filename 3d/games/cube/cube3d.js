@@ -431,9 +431,10 @@ function renderPlay() {
   $("#pad").hidden = !showPad;
   $("#btnPad").setAttribute("aria-pressed", String(showPad));
   $("#btnTimer").setAttribute("aria-pressed", String(showTimer));
-  $("#playTip").hidden = showPad;
+  $("#playTip").hidden = showPad || showTimer;
   renderPad();
   renderCounter();
+  renderFlatDirs();
   layout();
 }
 
@@ -587,10 +588,10 @@ async function stageDone(si) {
   if (last) return finishAll();
   sfx("star");
   buddy.celebrate(1400);
-  buddy.say(
-    `${t("stageDone", name)} ${t("stageTreat", buddyName(), treats())}`,
-    2600,
-  );
+  // short, so the bubble hardly covers the cube; the treat flying into the
+  // buddy's mouth tells the rest (the words are read out for pre-readers)
+  buddy.say(t("stageDone", name), 2200);
+  speak(`${t("stageDone", name)} ${t("stageTreat", buddyName(), treats())}`);
   feedTreat();
   renderStages();
 }
@@ -976,7 +977,6 @@ function renderLessons() {
   const box = $("#lessons");
   box.textContent = "";
   const names = stageNames();
-  const ids = E.STAGES[size];
   $("#learnSize").textContent = t(size === 3 ? "size3" : "size2");
   $("#learnStars").textContent = t("totalStars", totalStars(), E.MAX_STARS);
   names.forEach((name, i) => {
@@ -990,7 +990,6 @@ function renderLessons() {
     b.setAttribute("aria-label", t("lessonLabel", i + 1, name, got, open));
     b.addEventListener("click", () => openLesson(i));
     box.appendChild(b);
-    void ids;
   });
 }
 async function openLesson(i) {
