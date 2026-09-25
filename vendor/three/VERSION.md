@@ -8,7 +8,9 @@
 | File | Source |
 | --- | --- |
 | `three.module.min.js` | `build/three.module.js` + `build/three.core.js` bundled into one minified ES module (the npm package no longer ships `.min.js` files) |
-| `addons/geometries/RoundedBoxGeometry.js` | `examples/jsm/geometries/RoundedBoxGeometry.js`, unchanged |
+
+No addons are vendored yet: the kit builds everything from core primitives. Add one only when a page
+imports it (copy it unchanged to `addons/<path>` and list it here); the `three/addons/` import-map entry is ready.
 
 Pages load it through an import map (paths relative to the page):
 
