@@ -84,8 +84,13 @@ export function createCubeView(stage, handlers = {}) {
   let glowing = [];
   let arrowObj = null;
   let enabled = true;
+  let epoch = 0; // bumped by build(): turns still running then just end
+  const pivots = new Set();
 
   function build(size) {
+    epoch++;
+    for (const p of pivots) cube.remove(p);
+    pivots.clear();
     for (const c of cubies) cube.remove(c.group);
     n = size;
     const geo = E.geometry(n);
@@ -136,10 +141,14 @@ export function createCubeView(stage, handlers = {}) {
       : cubies.filter((c) => info.layers.includes(c.pos[info.axis]));
     const pivot = new THREE.Group();
     cube.add(pivot);
+    pivots.add(pivot);
     for (const c of moving) pivot.attach(c.group);
     busy++;
     const axis = AXES[info.axis];
+    const born = epoch;
     const finish = () => {
+      pivots.delete(pivot);
+      if (born !== epoch) return void busy--; // the cube was rebuilt meanwhile
       for (const c of moving) {
         cube.add(c.group);
         c.group.position.set(...c.pos);

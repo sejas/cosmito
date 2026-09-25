@@ -182,12 +182,13 @@ let mode = "home";
 const queue = [];
 let pumping = false;
 let locked = false; // e.g. while an "oops" undoes itself
+let gen = 0; // bumped when the cube is replaced: stale animations then show the new cube
 view.build(size);
 view.setState(state);
 
 function commit(move, { ms = SPEED.turn, from = 0 } = {}) {
   state = E.applyOne(state, move);
-  const item = { move, ms, from, after: state.slice() };
+  const item = { move, ms, from, after: state.slice(), gen };
   const done = new Promise((r) => (item.resolve = r));
   queue.push(item);
   if (!pumping) pump();
@@ -199,6 +200,7 @@ async function pump() {
   while (queue.length) {
     const q = queue.shift();
     await view.turn(q.move, { ms: q.ms, after: q.after, from: q.from });
+    if (q.gen !== gen) view.setState(state);
     q.resolve();
   }
   pumping = false;
@@ -211,6 +213,7 @@ const idle = () =>
     check();
   });
 function setCube(s, { pop = false } = {}) {
+  gen++;
   state = s.slice();
   queue.length = 0;
   view.setState(state);
@@ -337,7 +340,7 @@ function redo() {
   counted();
 }
 function reset() {
-  if (locked) return;
+  locked = false; // also stops a mix that is still spinning
   setCube(E.solved(size), { pop: true });
   P.history = [];
   P.future = [];
@@ -364,7 +367,6 @@ setInterval(
 );
 $("#btnMix").addEventListener("click", mix);
 $("#btnSize").addEventListener("click", () => {
-  if (locked) return;
   setSize(size === 3 ? 2 : 3);
   reset();
 });
@@ -477,12 +479,14 @@ async function startGuide({
   };
   setMode(lesson ? "lesson" : "guide");
   if (scramble && !lesson) {
+    const session = G;
     locked = true;
     E.scramble(size, Math.random, size === 3 ? 25 : 11).forEach((m) =>
       commit(m, { ms: SPEED.mix }),
     );
     sfx("level");
     await idle();
+    if (G !== session) return; // left while mixing
     locked = false;
   }
   plan();
