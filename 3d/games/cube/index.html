@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Cube 3D</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧊</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../../shared/base.css" />
+  <link rel="stylesheet" href="../../../shared/mascot.css" />
+  <link rel="stylesheet" href="../../kit/ui.css" />
+  <link rel="stylesheet" href="cube3d.css" />
+  <link rel="modulepreload" href="../../../vendor/three/three.module.min.js" />
+  <script type="importmap">
+    { "imports": { "three": "../../../vendor/three/three.module.min.js", "three/addons/": "../../../vendor/three/addons/" } }
+  </script>
+</head>
+<body class="mode-home">
+  <nav class="kit-hud cu-head">
+    <a class="kit-chip cu-home" id="btnHome" href="../../index.html" data-i18n-aria="homeLabel"><span aria-hidden="true">🏝️</span><span class="cu-wide" data-i18n="home"></span></a>
+    <button class="kit-chip cu-back" id="btnMenu" type="button" data-i18n-aria="menuLabel"><span aria-hidden="true">⬅</span><span class="cu-wide" data-i18n="menu"></span></button>
+    <span class="kit-chip cu-count" id="counter" hidden aria-live="off"></span>
+    <button class="kit-chip" id="btnBuddy" type="button"></button>
+    <button class="kit-chip" id="btnLang" type="button"></button>
+    <button class="kit-chip" id="btnSound" type="button"></button>
+  </nav>
+
+  <!-- flat fallback (no WebGL2): the unfolded cube + a 2D buddy -->
+  <div class="cu-flat" id="flat" hidden>
+    <div class="cu-flatbuddy">
+      <div class="mascot-wrap" id="flatMascot"><div class="bubble" id="flatBubble" aria-live="polite"></div></div>
+    </div>
+  </div>
+
+  <!-- stage progress (guide + lessons) -->
+  <ol class="kit-glass cu-stages" id="stages" data-i18n-aria="stagesLabel"></ol>
+
+  <!-- HOME -->
+  <section class="cu-panel cu-menu" id="home">
+    <h1 class="kit-glass cu-title"><span aria-hidden="true">🧊</span> <span id="title"></span></h1>
+    <div class="kit-glass cu-menucard">
+      <div class="cu-size" role="radiogroup" data-i18n-aria="sizeLabel">
+        <button type="button" role="radio" data-size="2" data-i18n="size2"></button>
+        <button type="button" role="radio" data-size="3" data-i18n="size3"></button>
+      </div>
+      <div class="cu-modes">
+        <button class="cu-mode" type="button" data-go="play"><span class="cu-mico" aria-hidden="true">🎮</span><span class="cu-mtext"><b data-i18n="modePlay"></b><small data-i18n="modePlayAbout"></small></span></button>
+        <button class="cu-mode" type="button" data-go="guide"><span class="cu-mico" aria-hidden="true">🧭</span><span class="cu-mtext"><b data-i18n="modeGuide"></b><small id="guideAbout"></small></span></button>
+        <button class="cu-mode" type="button" data-go="paint"><span class="cu-mico" aria-hidden="true">🖌️</span><span class="cu-mtext"><b data-i18n="modeReal"></b><small data-i18n="modeRealAbout"></small></span></button>
+        <button class="cu-mode" type="button" data-go="learn"><span class="cu-mico" aria-hidden="true">📖</span><span class="cu-mtext"><b data-i18n="modeLearn"></b><small id="learnAbout"></small></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FREE PLAY -->
+  <section class="cu-panel cu-dock" id="play" hidden>
+    <p class="kit-glass cu-tip" id="playTip" data-i18n="playTip"></p>
+    <div class="kit-glass cu-tools">
+      <button class="cu-tool" id="btnMix" type="button" data-i18n-aria="scrambleLabel"><span aria-hidden="true">🎲</span><small data-i18n="scramble"></small></button>
+      <button class="cu-tool" id="btnUndo" type="button" data-i18n-aria="undo"><span aria-hidden="true">↩️</span><small data-i18n="undo"></small></button>
+      <button class="cu-tool" id="btnRedo" type="button" data-i18n-aria="redo"><span aria-hidden="true">↪️</span><small data-i18n="redo"></small></button>
+      <button class="cu-tool" id="btnReset" type="button" data-i18n-aria="resetLabel"><span aria-hidden="true">✨</span><small data-i18n="reset"></small></button>
+      <button class="cu-tool" id="btnPad" type="button" aria-pressed="false" data-i18n-aria="padLabel"><span aria-hidden="true">🎛️</span><small data-i18n="pad"></small></button>
+      <button class="cu-tool" id="btnTimer" type="button" aria-pressed="false" data-i18n-aria="timerLabel"><span aria-hidden="true">⏱️</span><small data-i18n="timer"></small></button>
+      <button class="cu-tool hot" id="btnHelp" type="button" data-i18n-aria="helpMeLabel"><span aria-hidden="true">🧭</span><small data-i18n="helpMe"></small></button>
+    </div>
+    <div class="kit-glass cu-pad" id="pad" hidden></div>
+  </section>
+
+  <!-- GUIDED SOLVE / LESSON -->
+  <section class="cu-panel cu-dock" id="guide" hidden>
+    <div class="kit-glass cu-card">
+      <div class="cu-say"><span class="cu-sayface" id="sayFace" aria-hidden="true"></span><span class="cu-saytext" id="sayText" aria-live="polite"></span></div>
+      <div class="cu-hold" id="hold" hidden></div>
+      <div class="cu-move">
+        <div class="cu-glyph" id="mvGlyph" aria-hidden="true"></div>
+        <div class="cu-mvtext">
+          <div class="cu-mvline" id="mvText" aria-live="polite"></div>
+          <div class="cu-alg" id="mvAlg"></div>
+        </div>
+      </div>
+      <div class="cu-gbtns">
+        <div class="cu-dirs" id="dirs"></div>
+        <span class="cu-gsep" aria-hidden="true"></span>
+        <button class="cu-gbtn" id="btnBack" type="button" data-i18n-aria="backLabel" hidden><span aria-hidden="true">↩️</span><small data-i18n="back"></small></button>
+        <button class="cu-gbtn" id="btnWatch" type="button" data-i18n-aria="watchLabel"><span aria-hidden="true">▶️</span><small data-i18n="watch"></small></button>
+        <button class="cu-gbtn" id="btnSkip" type="button" data-i18n-aria="skipLabel"><span aria-hidden="true">⏩</span><small data-i18n="skip"></small></button>
+        <button class="cu-gbtn cu-did" id="btnDid" type="button" data-i18n-aria="didItLabel" hidden><span aria-hidden="true">✓</span><small data-i18n="didIt"></small></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAINT MY REAL CUBE -->
+  <section class="cu-panel cu-dock" id="paint" hidden>
+    <div class="kit-glass cu-card cu-paintcard">
+      <div class="cu-phead">
+        <span class="cu-pdiag" id="pDiag"></span>
+        <div class="cu-ptext"><b id="pStep"></b><span id="pText"></span></div>
+      </div>
+      <div class="cu-prow">
+        <div class="cu-pgrid" id="pGrid" role="group"></div>
+        <div class="cu-palette" id="palette" role="radiogroup" data-i18n-aria="paletteLabel"></div>
+      </div>
+      <div class="cu-pnav">
+        <button class="kit-btn" id="btnPrev" type="button"><span aria-hidden="true">◀</span> <span data-i18n="prev"></span></button>
+        <button class="kit-btn primary" id="btnNext" type="button"><span data-i18n="next"></span> <span aria-hidden="true">▶</span></button>
+        <button class="kit-btn primary" id="btnCheck" type="button" hidden><span aria-hidden="true">✓</span> <span data-i18n="check"></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section class="cu-panel cu-learn" id="learn" hidden>
+    <div class="kit-glass cu-lessons">
+      <h2 class="cu-ltitle"><span data-i18n="learnTitle"></span> <span id="learnSize"></span> <span class="cu-lstars" id="learnStars"></span></h2>
+      <div class="cu-lgrid" id="lessons"></div>
+    </div>
+  </section>
+
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <script src="../../../shared/storage.js"></script>
+  <script src="../../../shared/i18n.js"></script>
+  <script src="../../../shared/audio.js"></script>
+  <script src="../../../shared/fx.js"></script>
+  <script src="../../../shared/mascot.js"></script>
+  <script src="../../../shared/mascots/pipo.js"></script>
+  <script src="../../../shared/mascots/bollo.js"></script>
+  <script src="cube-engine.js"></script>
+  <script type="module" src="cube3d.js"></script>
+</body>
+</html>
