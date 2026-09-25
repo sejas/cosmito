@@ -1,4 +1,5 @@
-// Pure hub logic (no three.js, no DOM): portal layout and rank maths.
+// Pure hub logic (no three.js, no DOM): portal layout. Rank maths and names
+// are shared with the 2D hub: hubRank / HUB_RANKS in hub/games.js.
 
 // Where the portals, the buddy and the camera go for n games and a viewport
 // aspect. Wide screens get an arc of portals around the buddy; tall screens a
@@ -48,13 +49,4 @@ export function layoutHub(n, aspect) {
     },
     wide: false,
   };
-}
-
-// Rank index and stars needed for the next rank, like the 2D hub.
-export function rankFor(have, max, rankCount) {
-  if (!max || rankCount < 2) return { rank: 0, toNext: 0, last: true };
-  const step = max / (rankCount - 1);
-  const rank = Math.min(rankCount - 1, Math.floor(have / step));
-  const last = rank === rankCount - 1;
-  return { rank, toNext: last ? 0 : Math.ceil(step * (rank + 1)) - have, last };
 }

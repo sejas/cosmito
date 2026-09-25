@@ -12,15 +12,7 @@
       soundOff: "🔇 Muted",
       soon: "More games coming soon!",
       soonAbout: "Want to make one? It's open source! 🛠️",
-      ranks: [
-        "New Explorer 🧭",
-        "Curious Cub 🐾",
-        "Bright Spark ✨",
-        "Super Learner 🚀",
-        "Legend 👑",
-      ],
-      next: (n, rank) => `${n} more ⭐ to become ${rank}`,
-      maxed: "You collected every star! 🏆",
+      ...HUB_RANKS.en, // ranks, next, maxed (hub/games.js)
       welcome: "Hi friend! What shall we play today? 🎈",
       chosen: "Yay! Let's play together! 🎉",
       myBuddy: "⭐ My buddy",
@@ -36,15 +28,7 @@
       soundOff: "🔇 Silencio",
       soon: "¡Pronto habrá más juegos!",
       soonAbout: "¿Quieres crear uno? ¡Es código abierto! 🛠️",
-      ranks: [
-        "Explorador novato 🧭",
-        "Cachorro curioso 🐾",
-        "Chispa brillante ✨",
-        "Súper aprendiz 🚀",
-        "Leyenda 👑",
-      ],
-      next: (n, rank) => `${n} ⭐ más para ser ${rank}`,
-      maxed: "¡Tienes todas las estrellas! 🏆",
+      ...HUB_RANKS.es,
       welcome: "¡Hola! ¿A qué jugamos hoy? 🎈",
       chosen: "¡Bien! ¡Vamos a jugar juntos! 🎉",
       myBuddy: "⭐ Mi amigo",
@@ -155,16 +139,13 @@
     const have = KidsStore.totalStars();
     const max = GAMES.reduce((sum, g) => sum + g.maxStars, 0);
     const ranks = t("ranks");
-    const step = max / (ranks.length - 1);
-    const rank = Math.min(ranks.length - 1, Math.floor(have / step));
+    const { rank, toNext, last } = hubRank(have, max, ranks.length);
     $("#rank").textContent = ranks[rank];
     $("#stars").textContent = have;
     $("#maxStars").textContent = max;
     $("#bar").style.width = `${(have / max) * 100}%`;
     $("#next").textContent =
-      rank < ranks.length - 1
-        ? t("next", Math.ceil(step * (rank + 1)) - have, ranks[rank + 1])
-        : t("maxed");
+      last ? t("maxed") : t("next", toNext, ranks[rank + 1]);
   }
 
   // The 3D edition needs WebGL2; only offer it where it can run.
