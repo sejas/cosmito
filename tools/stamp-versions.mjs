@@ -7,7 +7,7 @@
 //
 // Rewrites, for relative URLs only (bare module names like "three" and absolute
 // http(s) URLs are left alone):
-//   - HTML: src="…js", href="…css", and paths inside <script type="importmap">
+//   - HTML: src="…js", href="…css" / "…js" (modulepreload), and paths inside <script type="importmap">
 //   - JS:   static `import … from "…js"`, `import "…js"`, `export … from "…js"`,
 //           and dynamic `import("…js")`
 // Every reference to a module gets the same stamp, so ES modules keep a single
@@ -29,8 +29,10 @@ export function stampHtml(html, version) {
     /(<script\b[^>]*\ssrc=")([^"]+\.js)(")/gi,
     (m, a, url, b) => a + stamp(url, version) + b
   );
+  // Stylesheets and module preloads (a preload must match the stamped URL the
+  // import map resolves to, or the browser fetches the file twice).
   out = out.replace(
-    /(<link\b[^>]*\shref=")([^"]+\.css)(")/gi,
+    /(<link\b[^>]*\shref=")([^"]+\.(?:css|js))(")/gi,
     (m, a, url, b) => a + stamp(url, version) + b
   );
   out = out.replace(/(<script\b[^>]*type="importmap"[^>]*>)([\s\S]*?)(<\/script>)/gi, (m, a, json, b) => {

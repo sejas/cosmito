@@ -46,3 +46,11 @@ const u = new URL("icons/pepper.svg", document.currentScript.src);`;
 test("already-stamped URLs are left alone", () => {
   assert.equal(stampJs(`import x from "./a.js?v=old";`, "new"), `import x from "./a.js?v=old";`);
 });
+
+test("module preloads get the same stamp as the import map", () => {
+  const html = `<link rel="modulepreload" href="../vendor/three/three.module.min.js" />
+<script type="importmap">{ "imports": { "three": "../vendor/three/three.module.min.js" } }</script>`;
+  const out = stampHtml(html, "z9");
+  assert.match(out, /modulepreload" href="\.\.\/vendor\/three\/three\.module\.min\.js\?v=z9"/);
+  assert.match(out, /"three": "\.\.\/vendor\/three\/three\.module\.min\.js\?v=z9"/);
+});
