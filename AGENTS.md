@@ -116,7 +116,7 @@ python3 -m http.server 8000                          # then play it in a real br
 - **Mic pitch detection:** YIN on 2048 samples with a median of recent frames. Match in **any octave** (a child sings the notes an octave higher), with ±1 semitone of tolerance.
 - **three.js labels:** redraw the canvas texture *and replace the GPU texture* when the text or font changes its size, or WebGL errors and clips the text. This is fixed in `Kit.label`.
 - **Colour mixing:** naive RGB averaging turns blue + yellow into grey. `games/colors` uses an RYB model plus pigment-like tints and shades.
-- **Static hosting caches:** some servers send `.js`/`.css` as `immutable` for 30 days. Version the file URLs when you redeploy, or returning visitors run stale scripts.
+- **Static hosting caches:** some servers send `.js`/`.css` as `immutable` for 30 days. Deploy a copy (`git archive`), then run `node tools/stamp-versions.mjs <copy> <commit>`: it adds `?v=<commit>` to every local script, style, import-map and ES-module import, consistently, so modules still load once. Never run it on the repo.
 - **Trademark check:** "PIPO" is an active Spanish trademark for kids' software. Check names (project and mascots) for trademarks and for slang in *all* Spanish variants before publishing ("Bollo" has slang meanings in Spain and Cuba). A rename is pending.
 
 ## Working with parallel agents (how this repo was built)

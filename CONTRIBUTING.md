@@ -49,6 +49,6 @@ await context.addInitScript(() => {
 ## Checks before a pull request
 
 ```sh
-node --test games/*/js/*.test.js "3d/**/*.test.js"   # logic tests
+node --test games/*/js/*.test.js "3d/**/*.test.js" tools/*.test.mjs   # logic tests
 python3 -m http.server 8000   # then play your change in the browser, desktop and phone width
 ```
