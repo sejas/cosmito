@@ -1,0 +1,168 @@
+/* Times Tables 3D: glass HUD over the 3D world. Loads after kit/ui.css. */
+html, body { height: 100%; overflow: hidden; }
+body { background: linear-gradient(#6fb8ff, #bfe6ff 55%, #ffe3f1); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.tt-hud .tt-lead { margin-right: auto; }
+.tt-hud > :first-child { margin-right: 0; }
+.tt-hud > .tt-lead { margin-right: auto; }
+
+.tt-ui { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+.tt-ui button, .tt-ui a, .tt-ui .kit-glass { pointer-events: auto; }
+.tt-screen { position: absolute; inset: 0; }
+
+/* Top card sits under the HUD (JS sets --hud-h); bottom panel above the edge. */
+.tt-top {
+  position: absolute; left: 50%; top: calc(var(--hud-h, 64px) + 8px); transform: translateX(-50%);
+  width: min(560px, calc(100vw - 32px)); text-align: center;
+}
+.tt-bottom {
+  position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+  width: min(620px, calc(100vw - 32px));
+}
+.tt-card { padding: 10px 16px 12px; }
+.tt-kicker { display: flex; justify-content: center; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: var(--ink-soft); min-height: 22px; }
+
+/* ---- home ---- */
+.tt-rank { display: flex; align-items: center; gap: 12px; padding: 8px 16px; width: min(460px, calc(100vw - 32px)); text-align: left; }
+.tt-basket { display: inline-flex; align-items: center; gap: 4px; font-size: 22px; font-weight: 700; white-space: nowrap; }
+.tt-treat img { width: 1.1em; height: 1.1em; vertical-align: -0.2em; }
+.tt-rank-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tt-rank-row { display: flex; justify-content: space-between; gap: 8px; font-size: 15px; }
+.tt-rank-row strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-rank-row span { white-space: nowrap; font-weight: 600; }
+.tt-rank .kit-bar { height: 10px; }
+
+.tt-panel { padding: 12px 14px 14px; }
+.tt-sel { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+.tt-sel-title { margin: 0; font-size: 24px; line-height: 1.1; }
+.tt-sel-stars { font-size: 22px; letter-spacing: 1px; color: rgba(38, 49, 92, 0.18); white-space: nowrap; }
+.tt-sel-stars .on { color: var(--gold); text-shadow: 0 2px 0 var(--gold-dark); }
+.tt-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.tt-mode {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  min-height: 84px; padding: 8px 6px; border-radius: 22px; border: 1.5px solid #fff; cursor: pointer;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), color-mix(in srgb, var(--c, #ffd84d) 30%, #fff));
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--c, #ffd84d) 60%, #8a8fc0), 0 10px 20px rgba(64, 76, 170, 0.16), var(--kit-inner);
+  transition: transform 0.16s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.16s;
+  color: var(--ink); line-height: 1.1;
+}
+.tt-mode:hover { transform: translateY(-3px) scale(1.03); }
+.tt-mode:active { transform: translateY(4px) scale(0.97); box-shadow: 0 1px 0 color-mix(in srgb, var(--c, #ffd84d) 60%, #8a8fc0); }
+.tt-mode b { font-size: 19px; }
+.tt-mode small { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; }
+.tt-mode-emoji { font-size: 28px; line-height: 1; filter: drop-shadow(0 3px 3px rgba(64, 76, 170, 0.2)); }
+.tt-mode.locked { opacity: 0.72; filter: saturate(0.4); }
+.tt-mode.shake { animation: tt-shake 0.45s; }
+.tt-rush { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.tt-rush-btn { flex-direction: column; gap: 0; padding: 8px 12px; font-size: 18px; line-height: 1.1; min-height: 56px; }
+.tt-rush-btn small { font-size: 12px; font-weight: 600; opacity: 0.85; }
+.tt-rush-btn small:empty { display: none; }
+
+/* ---- learn ---- */
+.tt-eq { font-size: clamp(34px, 8vw, 46px); font-weight: 700; line-height: 1.1; letter-spacing: 1px; }
+.tt-eq b { color: var(--accent-dark); }
+.tt-sub { font-size: 17px; font-weight: 600; color: var(--ink-soft); }
+.tt-skip { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.tt-skip span {
+  min-width: 30px; padding: 2px 6px; border-radius: 99px; font-weight: 700; font-size: 14px;
+  background: rgba(38, 49, 92, 0.07); color: rgba(38, 49, 92, 0.4);
+}
+.tt-skip .done { background: color-mix(in srgb, var(--tc, #ffd84d) 45%, #fff); color: var(--ink); }
+.tt-skip .now { background: var(--accent); color: #fff; transform: scale(1.12); box-shadow: 0 3px 10px rgba(255, 107, 154, 0.45); }
+.tt-nav { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; pointer-events: none; }
+.tt-nav > * { pointer-events: auto; }
+.tt-nav-btn { min-width: 128px; }
+.tt-nav .kit-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+.tt-step { width: 100%; text-align: center; font-weight: 600; font-size: 14px; color: var(--ink); text-shadow: 0 1px 0 #fff; order: -1; }
+
+/* ---- play ---- */
+.tt-q { font-size: clamp(40px, 10vw, 58px); font-weight: 700; line-height: 1.1; letter-spacing: 1px; transition: color 0.2s; }
+.tt-q.in { animation: tt-in 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.tt-q .typed { color: var(--accent-dark); }
+.tt-q .caret { display: inline-block; width: 0.08em; height: 0.8em; margin-left: 2px; background: var(--accent); border-radius: 2px; vertical-align: -0.02em; animation: tt-blink 1s steps(2) infinite; }
+.tt-card.good { box-shadow: 0 0 0 4px rgba(61, 220, 132, 0.55), var(--kit-shadow); }
+.tt-card.good .tt-q { color: #20a35a; }
+.tt-card.oops .tt-q { color: var(--ink); }
+.tt-dots { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+.tt-dot {
+  width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 700;
+  background: rgba(38, 49, 92, 0.1); color: #fff; transition: transform 0.2s;
+}
+.tt-dot.now { background: #fff; box-shadow: 0 0 0 3px var(--accent); transform: scale(1.15); }
+.tt-dot.good { background: #fff3bf; box-shadow: inset 0 0 0 2px var(--gold); }
+.tt-dot.fixed { background: #3ddc84; }
+.tt-dot.retry { background: #ffc9c9; }
+.tt-dot img, .tt-dot .treat { width: 18px; height: 18px; font-size: 14px; line-height: 1; }
+.tt-streak { display: none; padding: 1px 10px; border-radius: 99px; color: #fff; font-weight: 700; background: linear-gradient(90deg, #ff922b, #ff6b6b); box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4); }
+.tt-streak.on { display: inline-block; animation: tt-in 0.35s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.tt-timer { display: flex; justify-content: center; gap: 12px; margin-top: 4px; font-weight: 700; font-size: 20px; }
+.tt-time::before { content: "⏱ "; }
+.tt-timer.hurry .tt-time { color: #e03131; animation: tt-pulse 0.5s infinite alternate; }
+.tt-score { padding: 0 12px; border-radius: 99px; background: #fff3bf; box-shadow: inset 0 0 0 2px var(--gold); }
+.tt-score.pop { animation: tt-in 0.35s; }
+.tt-bonus { position: absolute; left: 50%; top: 100%; transform: translate(-50%, 4px); font-weight: 700; font-size: 22px; color: #0ca678; text-shadow: 0 2px 0 #fff; animation: tt-rise 1.2s forwards; }
+.tt-feedback { min-height: 22px; font-size: 16px; font-weight: 600; color: var(--ink-soft); }
+.tt-feedback:empty { display: none; }
+
+/* ---- results ---- */
+.tt-result { text-align: center; }
+.tt-result-line { font-size: 22px; font-weight: 700; }
+.tt-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 8px 0 2px; }
+.tt-badges:empty { display: none; }
+.tt-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 99px; font-weight: 600; font-size: 15px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 3px 8px rgba(64, 76, 170, 0.14); }
+.tt-badge img { width: 18px; height: 18px; }
+.tt-actions { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
+/* Speech bubble kept on screen by tt3d.js: its tail follows the buddy. */
+.kit-bubble::after { left: calc(50% + var(--tt-tail, 0px)); }
+
+/* Jar count chip pinned in 3D */
+.tt-jar-chip { padding: 2px 12px; border-radius: 99px; font-weight: 700; font-size: 17px; white-space: nowrap; pointer-events: none !important; }
+.tt-jar-chip img { width: 18px; height: 18px; vertical-align: -3px; }
+
+@keyframes tt-in { from { transform: scale(0.6); opacity: 0; } }
+@keyframes tt-blink { to { opacity: 0; } }
+@keyframes tt-pulse { to { transform: scale(1.12); } }
+@keyframes tt-shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+@keyframes tt-rise { to { transform: translate(-50%, -30px); opacity: 0; } }
+
+@media (max-width: 600px) {
+  .tt-hud { gap: 6px; }
+  .tt-hud .kit-chip { min-height: 40px; padding: 6px 11px; font-size: 14px; }
+  .tt-panel { padding: 10px 10px 12px; }
+  .tt-sel-title { font-size: 20px; }
+  .tt-mode { min-height: 74px; border-radius: 18px; }
+  .tt-mode b { font-size: 16px; }
+  .tt-mode small { font-size: 11px; }
+  .tt-mode-emoji { font-size: 24px; }
+  .tt-rush { gap: 8px; margin-top: 10px; }
+  .tt-rush-btn { font-size: 16px; padding: 6px 8px; min-height: 52px; }
+  .tt-card { padding: 8px 12px 10px; }
+  .tt-dot { width: 20px; height: 20px; font-size: 12px; }
+  .tt-dots { gap: 4px; }
+  .tt-skip span { min-width: 26px; font-size: 13px; padding: 1px 4px; }
+  .tt-sub { font-size: 15px; }
+  .tt-rank { padding: 6px 12px; }
+  .tt-rank-row { font-size: 13px; }
+  .tt-basket { font-size: 19px; }
+  .tt-nav-btn { min-width: 0; padding: 10px 18px; font-size: 18px; }
+  .tt-result-line { font-size: 19px; }
+}
+@media (max-width: 400px) {
+  .tt-hud .kit-chip { padding: 5px 9px; font-size: 13px; gap: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tt-q.in, .tt-streak.on, .tt-score.pop, .tt-mode.shake, .tt-timer.hurry .tt-time, .tt-q .caret { animation: none; }
+}
+
+/* Narrow phones: the Classic link moves into the rank card, Home is icon-only. */
+.tt-classic-mini { display: none; min-height: 36px; padding: 4px 12px; font-size: 14px; }
+@media (max-width: 520px) {
+  #btnClassic { display: none; }
+  .tt-classic-mini { display: inline-flex; }
+  .tt-home-text { display: none; }
+}
+
+/* No WebGL: the kit shows its fallback card; hide the game HUD. */
+.kit-no3d .tt-ui { display: none; }

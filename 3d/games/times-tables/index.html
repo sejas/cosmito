@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Times Tables 3D</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔢</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../../shared/base.css" />
+  <link rel="stylesheet" href="../../kit/ui.css" />
+  <link rel="stylesheet" href="tt3d.css" />
+  <link rel="modulepreload" href="../../../vendor/three/three.module.min.js" />
+  <script type="importmap">
+    { "imports": { "three": "../../../vendor/three/three.module.min.js", "three/addons/": "../../../vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <nav class="kit-hud tt-hud" id="hud">
+    <a class="kit-chip tt-lead" id="btnHome" href="../../index.html" data-i18n-aria="homeLabel"><span aria-hidden="true">🏝️</span> <span class="tt-home-text" data-i18n="home"></span></a>
+    <button class="kit-chip tt-lead" id="btnBack" type="button" data-i18n-aria="back" hidden><span aria-hidden="true">⬅</span> <span data-i18n="tables"></span></button>
+    <button class="kit-chip" id="btnBuddy" type="button"></button>
+    <button class="kit-chip" id="btnLang" type="button"></button>
+    <button class="kit-chip" id="btnSound" type="button"></button>
+    <a class="kit-chip" id="btnClassic" href="../../../games/times-tables/" data-i18n="classic" data-i18n-aria="classicLabel"></a>
+  </nav>
+
+  <main class="tt-ui" id="ui">
+    <!-- HOME: planets are 3D; this panel picks the mode -->
+    <section class="tt-screen" id="home" data-screen="home">
+      <div class="tt-top tt-rank kit-glass" id="rankCard">
+        <span class="tt-basket" id="basket" role="status"><span class="tt-treat" data-treat aria-hidden="true"></span> <b id="basketCount">0</b></span>
+        <span class="tt-rank-body">
+          <span class="tt-rank-row"><strong id="rankTitle"></strong><span id="rankStars"></span></span>
+          <span id="rankBarHost"></span>
+        </span>
+        <a class="kit-chip tt-classic-mini" href="../../../games/times-tables/" data-i18n-aria="classicLabel">2D</a>
+      </div>
+      <section class="tt-bottom tt-panel kit-glass kit-holo-edge" id="homePanel" aria-labelledby="selTitle">
+        <div class="tt-sel">
+          <h1 class="tt-sel-title" id="selTitle"></h1>
+          <span class="tt-sel-stars" id="selStars" role="img"></span>
+        </div>
+        <div class="tt-modes">
+          <button class="tt-mode" id="btnLearn" type="button"><span class="tt-mode-emoji" aria-hidden="true">📖</span><b data-i18n="learn"></b><small id="learnHint"></small></button>
+          <button class="tt-mode" id="btnPractice" type="button"><span class="tt-mode-emoji" aria-hidden="true">✏️</span><b data-i18n="practice"></b><small data-i18n="practiceHint"></small></button>
+          <button class="tt-mode tt-pro" id="btnPro" type="button"><span class="tt-mode-emoji" id="proEmoji" aria-hidden="true">🔒</span><b data-i18n="pro"></b><small id="proHint"></small></button>
+        </div>
+        <div class="tt-rush">
+          <button class="kit-btn primary tt-rush-btn" id="btnRushOne" type="button"><span id="rushOneLabel"></span><small id="rushOneBest"></small></button>
+          <button class="kit-btn tt-rush-btn" id="btnRushAll" type="button"><span data-i18n="rushAll"></span><small id="rushAllBest"></small></button>
+        </div>
+      </section>
+    </section>
+
+    <!-- LEARN: the 3D array grows row by row -->
+    <section class="tt-screen" id="learn" data-screen="learn" hidden>
+      <div class="tt-top kit-glass tt-card" id="learnCard">
+        <div class="tt-kicker" id="learnTitle"></div>
+        <div class="tt-eq" id="learnEq" aria-live="polite"></div>
+        <div class="tt-sub" id="groupsLabel"></div>
+        <div class="tt-skip" id="skipRow" aria-hidden="true"></div>
+      </div>
+      <div class="tt-bottom tt-nav">
+        <button class="kit-btn tt-nav-btn" id="learnPrev" type="button"><span aria-hidden="true">◀</span> <span data-i18n="prev"></span></button>
+        <button class="kit-btn kit-round" id="btnSpeak" type="button" data-i18n-aria="readAloud">🗣️</button>
+        <button class="kit-btn primary tt-nav-btn" id="learnNext" type="button"><span data-i18n="next"></span> <span aria-hidden="true">▶</span></button>
+        <button class="kit-btn primary tt-nav-btn" id="learnPractice" type="button" data-i18n="learnDone" hidden></button>
+        <div class="tt-step" id="learnStep"></div>
+      </div>
+    </section>
+
+    <!-- PLAY: practice, pro, rush -->
+    <section class="tt-screen" id="play" data-screen="play" hidden>
+      <div class="tt-top kit-glass tt-card" id="qCard">
+        <div class="tt-kicker"><span id="playTitle"></span><span class="tt-streak" id="streak" aria-hidden="true"></span></div>
+        <div class="tt-q" id="question" aria-live="assertive"></div>
+        <div class="tt-dots" id="dots" role="progressbar" aria-valuemin="0" aria-valuemax="10"></div>
+        <div class="tt-timer" id="timer" hidden>
+          <span class="tt-time" id="timerText" role="timer"></span>
+          <span class="tt-score" id="scorePill">⭐ <b id="rushScore">0</b></span>
+        </div>
+        <div class="tt-feedback" id="feedback" aria-live="polite"></div>
+      </div>
+      <div class="tt-bottom tt-nav">
+        <button class="kit-btn primary" id="btnGotIt" type="button" data-i18n="gotIt" hidden></button>
+      </div>
+    </section>
+
+    <!-- RESULTS: podium + stars in 3D -->
+    <section class="tt-screen" id="results" data-screen="results" hidden>
+      <div class="tt-bottom tt-panel tt-result kit-glass kit-holo-edge">
+        <div class="sr-only" id="starsSr" role="img"></div>
+        <div class="tt-result-line" id="resultLine" aria-live="polite"></div>
+        <div class="tt-sub" id="resultSub"></div>
+        <div class="tt-badges" id="badges"></div>
+        <div class="tt-actions">
+          <button class="kit-btn primary" id="btnAgain" type="button" data-i18n="playAgain"></button>
+          <button class="kit-btn" id="btnTables" type="button" data-i18n="tables"></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../../shared/storage.js"></script>
+  <script src="../../../shared/i18n.js"></script>
+  <script src="../../../shared/audio.js"></script>
+  <script src="../../../shared/fx.js"></script>
+  <script src="../../../shared/mascot.js"></script>
+  <script src="../../../shared/mascots/pipo.js"></script>
+  <script src="../../../shared/mascots/bollo.js"></script>
+  <script src="../../../games/times-tables/js/i18n.js"></script>
+  <script src="../../../games/times-tables/js/questions.js"></script>
+  <script type="module" src="tt3d.js"></script>
+</body>
+</html>
