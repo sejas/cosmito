@@ -499,6 +499,7 @@ export function createStage({
       return {
         button: h.button,
         setBase: () => h.baseScale.copy(obj.scale),
+        refreshLabel: () => h.setLabel?.(),
         set enabled(v) {
           h.enabled = v;
           if (h.button) h.button.disabled = !v;

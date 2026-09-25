@@ -31,6 +31,14 @@
 .kit-hit:not(:focus-visible) { pointer-events: none; }
 .kit-hit:focus-visible { outline: 4px solid #fff; box-shadow: 0 0 0 8px rgba(255, 92, 154, 0.55), 0 0 30px rgba(255, 255, 255, 0.9); }
 
+/* Top bar for chips over a full-screen stage: <nav class="kit-hud">…</nav> */
+.kit-hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 8px;
+  padding: max(12px, env(safe-area-inset-top)) 16px 0; pointer-events: none;
+}
+.kit-hud > * { pointer-events: auto; }
+.kit-hud > :first-child { margin-right: auto; }
+
 /* Glass surfaces */
 .kit-glass {
   background: var(--kit-glass);

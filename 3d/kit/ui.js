@@ -195,6 +195,8 @@ export function toast(text, { ms = 5000, action } = {}) {
 
 // Full-page "no 3D here" screen with a link to the 2D version of this page.
 export function fallback(container, href) {
+  const existing = document.querySelector(".kit-fallback");
+  if (existing) return existing;
   document.documentElement.classList.add("kit-no3d");
   const box = el("div", "kit-glass kit-fallback");
   box.setAttribute("role", "alert");

@@ -299,6 +299,7 @@ if (stage) {
     });
   });
 
+  window.__hub = { stage, buddy: () => buddy, portals, games }; // for e2e tests
   setTimeout(() => {
     buddy.setMood("hop", 450);
     buddy.say(t("welcome"), 3600);
@@ -306,6 +307,7 @@ if (stage) {
   }, 900);
   Mascots.onBuddyChange(() => {
     render();
+    buddyTap.refreshLabel();
     setTimeout(() => {
       buddy.celebrate();
       buddy.say(pick(KidsI18n.pickLang(buddy.def.greeting)), 2400);
