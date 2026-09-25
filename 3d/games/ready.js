@@ -8,7 +8,7 @@ export const READY_3D = [
   //
   // "times-tables",
   //
-  // "code",
+  "code",
   //
   // "colors",
   //
