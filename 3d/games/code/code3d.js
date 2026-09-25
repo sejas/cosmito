@@ -161,18 +161,10 @@ function start() {
     center: [0, 1, -34],
     area: [90, 12, 26],
   });
-  // a soft sea of clouds far below everything
-  Kit.createClouds(stage.scene, {
-    count: 14,
-    center: [0, -9, -8],
-    area: [70, 2, 40],
-    speed: 0.15,
-    seed: 3,
-  });
   Kit.createSparkles(stage.scene, {
     count: 60,
-    center: [0, 3, -3],
-    area: [26, 8, 16],
+    center: [0, 4.5, -4],
+    area: [30, 4, 14],
   });
 
   const buddy = Kit.buddyMascot(stage, "pipo");
@@ -255,6 +247,10 @@ function start() {
     },
   });
 
+  // Drop leftover confetti/bursts when the scene changes (kit has no clear()).
+  const clearParticles = () => {
+    for (const p of Object.values(stage.particles.pools || {})) for (const b of p.bits) b.age = b.life;
+  };
   const fade = async (on) => {
     $("#fade").classList.toggle("on", on);
     await wait(reduced() ? 60 : 300);
@@ -365,7 +361,7 @@ function start() {
     }
     if (winView) {
       const g = board.goalPos();
-      const points = boxPoints([g.x - 1.25, g.y - 0.1, g.z - 0.5], [g.x + 1.25, g.y + 2.25, g.z + 0.5]);
+      const points = boxPoints([g.x - 1.25, g.y - 0.1, g.z - 0.5], [g.x + 1.25, g.y + 2.45, g.z + 0.5]);
       return fitPoints({ ...base, points, elevation: 20, margin: 1.06 });
     }
     const W = world.w + 0.7;
@@ -374,9 +370,32 @@ function start() {
     const tall = innerHeight > innerWidth * 1.2;
     return fitPoints({ ...base, points, elevation: tall ? 60 : 55, margin: 1.03 });
   }
+  // Camera moves: a newer move always wins over one still running (the
+  // kit's setView tweens can't be cancelled, so we drive it ourselves).
+  let camToken = 0;
+  function camTo(view, ms = 0, ease = "inOutCubic") {
+    const my = ++camToken;
+    if (!ms || reduced()) return stage.setView(view);
+    const p0 = stage.view.position.clone();
+    const t0 = stage.view.target.clone();
+    const p1 = new THREE.Vector3(...view.position);
+    const t1 = new THREE.Vector3(...view.target);
+    const p = new THREE.Vector3();
+    const q = new THREE.Vector3();
+    return stage.tween({
+      ms,
+      ease,
+      onUpdate: (k) => {
+        if (my !== camToken) return;
+        p.lerpVectors(p0, p1, k);
+        q.lerpVectors(t0, t1, k);
+        stage.setView({ position: p.toArray(), target: q.toArray() });
+      },
+    }).done;
+  }
   function reframe(ms = 0) {
     if (mode === "play" && !board) return Promise.resolve();
-    return stage.setView(viewFor(), ms);
+    return camTo(viewFor(), ms);
   }
   stage.onResize((w, h, aspect) => {
     map.layout(aspect >= 1.1);
@@ -443,7 +462,7 @@ function start() {
     sfx("level");
     const p = map.stoneTop(i);
     stage.burst(p.clone().setY(p.y + 0.4), { shape: "star", count: 18 });
-    await stage.setView(
+    await camTo(
       { position: [p.x, p.y + 2.2, p.z + 2.4], target: [p.x, p.y + 0.3, p.z] },
       reduced() ? 0 : 520,
       "inCubic",
@@ -464,6 +483,7 @@ function start() {
     await fade(true);
     standing = li;
     focusWorld = LEVELS[standing].world;
+    clearParticles();
     setMode("map");
     renderMap();
     placeOnStone(standing);
@@ -492,6 +512,7 @@ function start() {
     hintOn = !!L.tutor;
     failPath = null;
     board?.dispose();
+    clearParticles();
     board = createBoard(stage, {
       world,
       level: L,
@@ -511,12 +532,12 @@ function start() {
     // swoop in from above
     const f = viewFor();
     if (!reduced()) {
-      stage.setView({
+      camTo({
         position: [f.position[0], f.position[1] + 5, f.position[2] + 4],
         target: f.target,
       });
-      stage.setView(f, 900, "outCubic");
-    } else stage.setView(f);
+      camTo(f, 900, "outCubic");
+    } else camTo(f);
     const tip = L.tip ? t(`tips.${L.tip}`, treatName(1)) : null;
     const lvl = L;
     setTimeout(() => {
@@ -1080,7 +1101,7 @@ function start() {
     g.add(ped, ring);
     const stars = [0, 1, 2].map((k) => {
       const st = Kit.star3D(k < s ? "#ffc93c" : "#e5dbff");
-      st.position.set((k - 1) * 0.78, 1.55 + (k === 1 ? 0.28 : 0), 0.1);
+      st.position.set((k - 1) * 0.72, 1.75 + (k === 1 ? 0.24 : 0), 0.1);
       st.rotation.z = (1 - k) * 0.25;
       st.scale.setScalar(0.001);
       g.add(st);
@@ -1106,7 +1127,7 @@ function start() {
         ms: reduced() ? 1 : 500,
         ease: "outBack",
         onUpdate: (v) =>
-          st.scale.setScalar(Math.max(0.001, v * (k === 1 ? 1.25 : 1))),
+          st.scale.setScalar(Math.max(0.001, v * (k === 1 ? 0.8 : 0.64))),
         onDone: () => {
           if (k < s) {
             sfx("star");
@@ -1124,7 +1145,7 @@ function start() {
       stars.forEach((st, k) => {
         st.rotation.y = Math.sin(time * 1.6 + k) * 0.5;
         st.position.y =
-          1.55 + (k === 1 ? 0.28 : 0) + Math.sin(time * 2 + k) * 0.05;
+          1.75 + (k === 1 ? 0.24 : 0) + Math.sin(time * 2 + k) * 0.05;
       });
     });
     return {
@@ -1146,7 +1167,8 @@ function start() {
     podium = buildPodium(s);
     stage.confetti();
     buddy.setMood("happy", 2400);
-    say(pick(t("win", treatName(1))), 3000);
+    buddy.hush(); // keep the star podium clear: the win line is read aloud instead
+    speak(pick(t("win", treatName(1))));
     $("#winStars").setAttribute("aria-label", t("winAria", s, blocks));
     [...$("#winStars").children].forEach((el, k) =>
       el.classList.toggle("on", k < s),

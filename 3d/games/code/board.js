@@ -7,7 +7,7 @@ import { TILE, cellToWorld, seeded } from "./logic.js";
 
 const TOP = 0.1; // y of the walkable tile surface
 export const PAD_COLORS = { y: "#ffd43b", p: "#f783c4" };
-const GRASS = ["#a3e98c", "#8fdc78"];
+const GRASS = ["#8fe07a", "#7ad168"];
 
 // ---------- shared geometries / materials (built once, reused per level) ----
 const cache = {};
@@ -104,8 +104,8 @@ function water() {
       uniform float uTime; varying vec3 vW;
       void main() {
         float n = sin(vW.x * 3.1 + uTime * 0.9) * 0.5 + sin(vW.z * 2.3 - uTime * 0.7) * 0.5;
-        vec3 deep = vec3(0.25, 0.62, 0.98);
-        vec3 light = vec3(0.50, 0.82, 1.0);
+        vec3 deep = vec3(0.13, 0.48, 0.93);
+        vec3 light = vec3(0.30, 0.68, 1.0);
         vec3 c = mix(deep, light, 0.5 + 0.35 * n);
         float s = sin(vW.x * 6.0 + sin(vW.z * 4.0 + uTime * 1.1) * 1.6 + uTime * 1.4);
         c += vec3(1.0) * smoothstep(0.93, 1.0, s) * 0.55;
@@ -170,13 +170,6 @@ export function createBoard(stage, { world, level, color, buddyId }) {
   );
   under.position.y = -0.62 - under.scale.y / 2;
   root.add(under);
-  const crystal = new THREE.Mesh(
-    once("crystal", () => new THREE.OctahedronGeometry(0.35, 0)),
-    padHolo(color),
-  );
-  crystal.position.y = under.position.y - under.scale.y / 2 - 0.35;
-  crystal.scale.set(1, 1.5, 1);
-  root.add(crystal);
 
   // --- water: one pond under the whole board ----------------------------
   const pond = new THREE.Mesh(
@@ -198,7 +191,7 @@ export function createBoard(stage, { world, level, color, buddyId }) {
       if (world.tiles[y][x] !== "~") land.push({ x, y });
   const tiles = new THREE.InstancedMesh(
     tileGeo(),
-    Kit.toon("#ffffff", { rim: 0.3, rimColor: "#f4fce3" }),
+    Kit.toon("#ffffff", { rim: 0.18, rimColor: "#f4fce3" }),
     land.length,
   );
   const m4 = new THREE.Matrix4();
@@ -431,10 +424,10 @@ export function createBoard(stage, { world, level, color, buddyId }) {
   goal.position.copy(pos(world.treat.x, world.treat.y, TOP + 0.01));
   const gRing = new THREE.Mesh(
     ringGeo(),
-    Kit.toon("#ffd43b", { rim: 0.7, emissive: "#5a4500" }),
+    Kit.toon("#ffffff", { rim: 0.8, rimColor: "#a5d8ff" }),
   );
   gRing.scale.setScalar(1.12);
-  const gDisc = new THREE.Mesh(discGeo(), padHolo("#ffe066"));
+  const gDisc = new THREE.Mesh(discGeo(), padHolo("#74c0fc"));
   gDisc.scale.setScalar(1.1);
   const treatHolder = new THREE.Group();
   treatHolder.position.y = 0.62;
@@ -442,6 +435,17 @@ export function createBoard(stage, { world, level, color, buddyId }) {
   treatShadow.position.y = 0.02;
   goal.add(gDisc, gRing, treatHolder, treatShadow);
   root.add(goal);
+  // three little stars circling the treat: "this is the goal!"
+  const orbit = new THREE.Group();
+  orbit.position.y = 0.62;
+  for (let k = 0; k < 3; k++) {
+    const st = Kit.star3D("#ffd43b");
+    const a = (k / 3) * Math.PI * 2;
+    st.position.set(Math.cos(a) * 0.46, Math.sin(a * 2) * 0.08, Math.sin(a) * 0.46);
+    st.scale.setScalar(0.2);
+    orbit.add(st);
+  }
+  goal.add(orbit);
   let treat = null;
   let treatK = 1;
   let treatTarget = 1;
@@ -457,18 +461,21 @@ export function createBoard(stage, { world, level, color, buddyId }) {
   onFrame((dt, t) => {
     treatK = Kit.damp(treatK, treatTarget, 8, dt);
     treatHolder.visible = treatK > 0.02;
+    orbit.visible = treatHolder.visible;
+    orbit.scale.setScalar(treatK);
     treatHolder.scale.setScalar(treatK);
     const still = stage.reducedMotion;
     treatHolder.rotation.y = still ? 0.5 : t * 1.1;
     treatHolder.position.y = 0.62 + (still ? 0 : Math.sin(t * 2) * 0.06);
     gRing.rotation.y = t * 0.5;
+    orbit.rotation.y = still ? 0 : -t * 1.4;
   });
 
   // --- hint path: glowing dots marching along the solution ----------------
   const maxDots = w * h * 2 + 2;
   const dots = new THREE.InstancedMesh(
     dotGeo(),
-    Kit.flat("#fff3a8", { opacity: 0.95 }),
+    Kit.flat("#ffd43b", { opacity: 0.95 }),
     maxDots,
   );
   dots.count = 0;
@@ -547,7 +554,6 @@ export function createBoard(stage, { world, level, color, buddyId }) {
   // ---------------------------------------------------------------------------
   const unsub = stage.onFrame((dt, t) => {
     water().uniforms.uTime.value = t;
-    if (!stage.reducedMotion) crystal.rotation.y = t * 0.7;
     for (const fn of frameFns) fn(dt, t);
   });
 

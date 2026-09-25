@@ -128,7 +128,7 @@ export function createWalker(stage, buddy) {
       await tween(
         ms * 0.5,
         (k) => {
-          root.position.y = from.y - k * 0.38;
+          root.position.y = from.y - k * 0.55;
         },
         "outQuad",
       );
