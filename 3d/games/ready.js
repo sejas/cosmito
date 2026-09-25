@@ -4,7 +4,7 @@
 // Keep one id per line with a separator line between them, so parallel
 // branches adding different games merge without conflicts.
 export const READY_3D = [
-  // "sing",
+  "sing",
   //
   "times-tables",
   //
