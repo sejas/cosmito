@@ -3,7 +3,6 @@
 // (stage.tap labels) for keyboard and screen readers.
 import * as THREE from "three";
 import * as Kit from "../../kit/kit.js";
-import { label } from "./world.js";
 import { keypadKeys } from "./logic.js";
 
 const BUBBLE_COLORS = ["#ff8fb8", "#b197fc", "#4fd8b0", "#5cb8ff"];
@@ -38,14 +37,14 @@ export function createBubbles(stage, { label: ariaLabel, onPick }) {
     dot.position.copy(
       new THREE.Vector3(-0.2, 0.66, 0.5).normalize().multiplyScalar(0.8),
     );
-    const num = label("0", {
+    const num = Kit.label("0", {
       size: 0.7,
       color: "#26315c",
       outline: "#ffffff",
     });
     num.position.set(0, 0, 0.86);
     num.renderOrder = 3;
-    const key = label(String(i + 1), {
+    const key = Kit.label(String(i + 1), {
       size: 0.3,
       color: "#ffffff",
       bg: "rgba(38,49,92,0.55)",
@@ -250,7 +249,7 @@ export function createKeypad(stage, { label: ariaLabel, onKey }) {
     const kind = key === "⌫" ? "del" : key === "✓" ? "ok" : "digit";
     const cap = new THREE.Mesh(geo, mats[kind]);
     cap.castShadow = true;
-    const txt = label(key, {
+    const txt = Kit.label(key, {
       size: key.length > 1 || kind !== "digit" ? 0.5 : 0.56,
       color: kind === "ok" ? "#ffffff" : "#26315c",
       outline: kind === "ok" ? "#0ca678" : null,

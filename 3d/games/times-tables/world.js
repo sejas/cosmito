@@ -318,19 +318,3 @@ export function createFireRing(stage) {
     },
   };
 }
-
-// Kit.label, made safe to re-text: the kit's setText resizes the canvas but
-// three.js keeps the old GPU texture size (WebGL "offset overflows texture"
-// errors, clipped text). Disposing the texture makes three re-upload it at the
-// new size. Same after the web font arrives (the kit redraws then too).
-export function label(text, opts) {
-  const s = Kit.label(text, opts);
-  const map = s.material.map;
-  const setText = s.userData.setText;
-  s.userData.setText = (t) => {
-    setText(t);
-    map.dispose();
-  };
-  document.fonts?.ready.then(() => map.dispose());
-  return s;
-}

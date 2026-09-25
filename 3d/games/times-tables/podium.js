@@ -2,7 +2,6 @@
 // (gold = earned), or a big floating score for Lightning Rush.
 import * as THREE from "three";
 import * as Kit from "../../kit/kit.js";
-import { label } from "./world.js";
 
 const GOLD = "#ffc93c";
 const EMPTY = "#dde2f7";
@@ -49,7 +48,7 @@ export function createPodium(stage) {
     starGroup.add(s);
     return s;
   });
-  const score = label("⭐ 0", {
+  const score = Kit.label("⭐ 0", {
     size: 1.05,
     color: "#26315c",
     bg: "rgba(255,255,255,0.9)",

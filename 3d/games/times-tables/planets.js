@@ -2,7 +2,6 @@
 // stars orbit (gold = earned). The selected planet grows and glows.
 import * as THREE from "three";
 import * as Kit from "../../kit/kit.js";
-import { label } from "./world.js";
 import { colorOf } from "./logic.js";
 
 const GOLD = "#ffc93c";
@@ -54,10 +53,10 @@ export function createPlanets(stage, { count = 10, label: ariaLabel, onPick }) {
       inner.add(s);
       return s;
     });
-    const num = label(`×${n}`, { size: 0.62, color: "#ffffff", outline: "#26315c" });
+    const num = Kit.label(`×${n}`, { size: 0.62, color: "#ffffff", outline: "#26315c" });
     num.position.set(0, 0.02, 0.62);
     num.renderOrder = 4;
-    const crown = label("👑", { size: 0.5 });
+    const crown = Kit.label("👑", { size: 0.5 });
     crown.position.set(0, 0.78, 0.2);
     crown.visible = false;
     inner.add(tilt, num, crown);
