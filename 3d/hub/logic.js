@@ -15,32 +15,36 @@ export function layoutHub(n, aspect) {
     });
     return {
       portals,
-      buddy: { x: 0, z: 2.4 },
+      buddy: { x: 0, z: 2.9 },
       view: {
         center: [0, 1.1, 0.3],
-        width: 2 * R + 2.6,
-        height: 5.6,
-        elevation: 24,
+        width: Math.max(2 * R + 2.6, 16.5),
+        height: 6.4,
+        elevation: 32,
       },
       wide: true,
     };
   }
-  const rows = Math.ceil(n / 2);
-  const gapZ = 2.9;
+  // phones in portrait: two columns (bigger portals); tablets: three
+  const cols = n > 4 && aspect >= 0.62 ? 3 : 2;
+  const rows = Math.ceil(n / cols);
+  const gapX = cols === 3 ? 2.15 : 2.8;
+  const gapZ = 3.6;
   const portals = Array.from({ length: n }, (_, i) => {
-    const row = Math.floor(i / 2);
-    const lastAlone = n % 2 === 1 && i === n - 1;
-    return { x: lastAlone ? 0 : i % 2 ? 1.75 : -1.75, z: 0.4 - row * gapZ };
+    const row = Math.floor(i / cols);
+    const inRow = Math.min(cols, n - row * cols);
+    const col = i % cols;
+    return { x: (col - (inRow - 1) / 2) * gapX, z: 0.2 - row * gapZ };
   });
   const depth = (rows - 1) * gapZ;
   return {
     portals,
-    buddy: { x: 0, z: 2.6 },
+    buddy: { x: 0, z: 3 },
     view: {
-      center: [0, 1, 1.4 - depth / 2],
-      width: 6,
-      height: 3.2 + depth * 0.62,
-      elevation: 38,
+      center: [0, 1.3, 1.5 - depth / 2],
+      width: cols * gapX + 0.9,
+      height: 5.8 + depth * 0.78, // + room for the labels above the back row
+      elevation: 50,
     },
     wide: false,
   };

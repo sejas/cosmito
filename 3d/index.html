@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pipo &amp; Friends 3D</title>
+  <meta name="description" content="Free, open-source learning games for kids, in 3D." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏝️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/base.css" />
+  <link rel="stylesheet" href="kit/ui.css" />
+  <link rel="stylesheet" href="hub/hub3d.css" />
+  <link rel="modulepreload" href="../vendor/three/three.module.min.js" />
+  <script type="importmap">
+    { "imports": { "three": "../vendor/three/three.module.min.js", "three/addons/": "../vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <header class="hub3d-head">
+    <h1 class="kit-glass hub3d-logo"><span data-i18n="title"></span> <span class="kit-badge" data-i18n="tagline"></span></h1>
+    <nav class="hub3d-chips">
+      <button class="kit-chip" id="btnBuddy" type="button"></button>
+      <button class="kit-chip" id="btnLang" type="button"></button>
+      <button class="kit-chip" id="btnSound" type="button"></button>
+      <a class="kit-chip" href="../index.html" data-i18n="classic" data-i18n-aria="classicLabel"></a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="world" class="world"></div>
+    <h2 class="sr-only" data-i18n="games"></h2>
+    <div id="portalList" class="portal-list"></div>
+  </main>
+
+  <section class="kit-glass trophy3d" aria-live="polite">
+    <div class="trophy3d-icon" aria-hidden="true">🏆</div>
+    <div class="trophy3d-body">
+      <div class="trophy3d-row"><strong id="rank"></strong><span id="starCount"></span></div>
+      <div id="barHost"></div>
+      <div class="trophy3d-next" id="next"></div>
+    </div>
+  </section>
+
+  <script src="../shared/storage.js"></script>
+  <script src="../shared/i18n.js"></script>
+  <script src="../shared/audio.js"></script>
+  <script src="../shared/fx.js"></script>
+  <script src="../shared/mascot.js"></script>
+  <script src="../shared/mascots/pipo.js"></script>
+  <script src="../shared/mascots/bollo.js"></script>
+  <script src="../hub/games.js"></script>
+  <script type="module" src="hub/hub3d.js"></script>
+</body>
+</html>

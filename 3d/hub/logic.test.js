@@ -16,11 +16,14 @@ test("wide layout: symmetric arc behind the buddy", () => {
   );
 });
 
-test("tall layout: two columns, rows going back, odd one centred", () => {
+test("tall layout: columns, rows going back, short rows centred", () => {
   const l = layoutHub(5, 390 / 844);
   assert.ok(!l.wide);
-  assert.equal(l.portals[4].x, 0);
-  assert.ok(l.portals[2].z < l.portals[0].z);
+  assert.equal(l.portals[4].x, 0, "phone: two columns, odd one centred");
+  const tab = layoutHub(5, 0.75).portals;
+  assert.equal(tab[3].x, -tab[4].x, "tablet: three columns, short last row centred");
+  assert.equal(layoutHub(3, 0.5).portals[2].x, 0);
+  assert.ok(l.portals[3].z < l.portals[0].z);
   const xs = l.portals.map((p) => Math.abs(p.x));
   assert.ok(Math.max(...xs) <= l.view.width / 2, "fits the framed width");
 });

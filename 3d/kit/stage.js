@@ -530,6 +530,7 @@ export function createStage({
           p.hidden = v;
         },
         setOffset: (o) => p.offset.set(...o),
+        setAlign: (a) => (p.align = a),
         remove() {
           pins.splice(pins.indexOf(p), 1);
           el.remove();
