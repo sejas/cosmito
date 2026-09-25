@@ -55,8 +55,7 @@ function speak(text) {
   if (KidsAudio.isMuted() || !("speechSynthesis" in window)) return;
   try {
     const clean = text
-      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}←→↑↓↻↺⟲⟳⇅⤒⤓✓]/gu, "")
-      .replace(/\b([URFDLBxyz])(2|')?(?=\s|$)/g, "")
+      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}←→↑↓↻↺⇐⇒⇑⇓⇅✓×]/gu, "")
       .trim();
     if (!clean) return;
     const lang = KidsI18n.get() === "es" ? "es-ES" : "en-US";
@@ -224,6 +223,7 @@ function setCube(s, { pop = false } = {}) {
 }
 function setSize(n) {
   size = n;
+  if (mode === "play") $("#sizeTxt").textContent = t(n === 3 ? "size3" : "size2");
   KidsStore.save(key("size"), n);
   queue.length = 0;
   view.build(n);
@@ -363,6 +363,11 @@ setInterval(
   500,
 );
 $("#btnMix").addEventListener("click", mix);
+$("#btnSize").addEventListener("click", () => {
+  if (locked) return;
+  setSize(size === 3 ? 2 : 3);
+  reset();
+});
 $("#btnUndo").addEventListener("click", undo);
 $("#btnRedo").addEventListener("click", redo);
 $("#btnReset").addEventListener("click", reset);
@@ -422,6 +427,7 @@ function moveButton(m, cls) {
   return b;
 }
 function renderPlay() {
+  $("#sizeTxt").textContent = t(size === 3 ? "size3" : "size2");
   $("#pad").hidden = !showPad;
   $("#btnPad").setAttribute("aria-pressed", String(showPad));
   $("#btnTimer").setAttribute("aria-pressed", String(showTimer));
@@ -507,6 +513,7 @@ function guideMove(m, from = 0) {
   return true;
 }
 async function oops(m, exp, from) {
+  const session = G;
   locked = true;
   commit(m, { from });
   sfx("wrong");
@@ -514,6 +521,7 @@ async function oops(m, exp, from) {
   buddy.say(exp[0] === m[0] ? t("oopsDir") : t("oops"), 2200);
   await idle();
   await wait(reduced() ? 150 : 450);
+  if (G !== session) return void (locked = false); // left the guide meanwhile
   commit(E.invertMove(m), { ms: SPEED.undo });
   await idle();
   locked = false;
@@ -571,8 +579,10 @@ function currentStageIndex() {
   return cur ? cur.stage : G.stages.length;
 }
 async function stageDone(si) {
+  const session = G;
   const last = G.lesson ? true : !G.flat[G.pos];
   await idle();
+  if (G !== session) return;
   const name = stageNames()[si];
   if (last) return finishAll();
   sfx("star");
@@ -609,9 +619,11 @@ function feedTreat() {
   });
 }
 async function finishAll() {
-  if (G.done) return;
+  const session = G;
+  if (!G || G.done) return;
   G.done = true;
   await idle();
+  if (G !== session) return;
   view.arrow(null);
   view.glow([]);
   renderGuide();
@@ -736,7 +748,7 @@ function renderGuide(stepChanged = false) {
   $("#btnDid").hidden = !G.real;
   $("#btnBack").hidden = !G.real;
   $("#btnWatch").hidden = G.real;
-  $("#btnSkip").hidden = G.real && false;
+  $("#btnSkip").hidden = G.real; // a real cube can't be fast-forwarded
   const hold = $("#hold");
   hold.hidden = !G.real;
   if (G.real) {
@@ -1115,7 +1127,6 @@ document.querySelectorAll(".cu-mode").forEach((b) =>
     const go = b.dataset.go;
     if (go === "play") {
       setMode("play");
-      buddy.say(t(stage ? "playTip" : "flatNote"), 3500);
     } else if (go === "guide") startGuide();
     else if (go === "paint") startPaint();
     else setMode("learn");

@@ -267,7 +267,7 @@ export function createCubeView(stage, handlers = {}) {
     new THREE.Euler(0, Math.PI, 0), // B
   ].map((e) => new THREE.Quaternion().setFromEuler(e));
   const TILT = new THREE.Quaternion().setFromEuler(
-    new THREE.Euler(-0.18, 0.3, 0), // turned towards the camera, a little of the top and right showing
+    new THREE.Euler(-0.04, 0.2, 0), // turned towards the camera, a little of the top and right showing
   );
   const peek = new THREE.Quaternion();
   const base = new THREE.Quaternion();

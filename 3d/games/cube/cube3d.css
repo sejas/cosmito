@@ -195,22 +195,25 @@ body { background: linear-gradient(#7cc4ff, #cdeaff 55%, #ffe1f0); min-height: 1
   .cu-mico { width: 42px; height: 42px; font-size: 28px; }
   .cu-mtext b { font-size: 17px; }
   .cu-mtext small { font-size: 12.5px; }
-  .cu-tool, .cu-gbtn { min-width: 48px; height: 58px; font-size: 21px; padding: 4px 4px 2px; }
+  .cu-tool, .cu-gbtn { min-width: 60px; height: 60px; font-size: 21px; padding: 4px 4px 2px; }
   .cu-tool small, .cu-gbtn small { font-size: 10.5px; }
-  .cu-tools { gap: 4px; padding: 6px; }
+  /* phones: two rows of four big tools */
+  .cu-tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px; }
+  .cu-tool { min-width: 0; height: 60px; }
   .cu-padbtn { width: 54px; height: 54px; }
   .cu-mvline { font-size: 17px; }
   .cu-glyph { width: 52px; height: 52px; font-size: 30px; }
   .cu-st { width: 36px; height: 36px; }
   .cu-st svg { width: 30px; height: 30px; }
-  .cu-pgrid { --pc: 54px; gap: 5px; }
+  .cu-pgrid { --pc: 60px; gap: 5px; padding: 6px; }
   .cu-pgrid:has(> :nth-child(4):last-child) { --pc: 76px; }
-  .cu-palette { grid-template-columns: repeat(2, 54px); }
-  .cu-pcol { width: 54px; height: 54px; }
+  .cu-palette { grid-template-columns: repeat(2, 58px); }
+  .cu-pcol { width: 58px; height: 58px; }
   .cu-ptext { font-size: 14px; }
 }
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   .cu-head .kit-chip { padding: 5px 9px; font-size: 13px; gap: 3px; }
+
 }
 @media (prefers-reduced-motion: reduce) {
   .cu-st.now, .cu-pcell.err, .net-cell.glow, .net-cell.err { animation: none; }
