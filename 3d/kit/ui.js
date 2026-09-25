@@ -1,9 +1,10 @@
 // Glass UI: HTML/CSS controls that float over the 3D canvas (styles in
 // ui.css). Real HTML means real focus, screen-reader labels and crisp text.
 import { kt } from "./i18n.js";
+import { I18N, AUDIO, MASCOTS } from "./shared.js";
 
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-const tap = () => window.KidsAudio?.sfx("tap");
+const tap = () => AUDIO()?.sfx("tap");
 
 export function el(tag, className = "", text = "") {
   const e = document.createElement(tag);
@@ -14,9 +15,9 @@ export function el(tag, className = "", text = "") {
 
 // Language chip (cycles KidsI18n languages).
 export function langChip(button) {
-  window.KidsI18n.mountPicker(button);
+  I18N().mountPicker(button);
   const label = () => button.setAttribute("aria-label", kt("langLabel"));
-  window.KidsI18n.onChange(label);
+  I18N().onChange(label);
   label();
   button.addEventListener("click", tap);
   return button;
@@ -24,14 +25,14 @@ export function langChip(button) {
 
 // Buddy chip (cycles mascots; every Kit mascot listening swaps itself).
 export function buddyChip(button, fallbackId = "pipo") {
-  window.Mascots.mountPicker(button, fallbackId);
+  MASCOTS().mountPicker(button, fallbackId);
   const label = () =>
     button.setAttribute(
       "aria-label",
       `${kt("buddyLabel")}: ${button.textContent}`,
     );
-  window.Mascots.onBuddyChange(label);
-  window.KidsI18n.onChange(label);
+  MASCOTS().onBuddyChange(label);
+  I18N().onChange(label);
   label();
   button.addEventListener("click", tap);
   return button;
@@ -40,19 +41,19 @@ export function buddyChip(button, fallbackId = "pipo") {
 // Sound chip (mute state shared with the 2D games).
 export function soundChip(button) {
   const render = () => {
-    button.textContent = window.KidsAudio.isMuted()
+    button.textContent = AUDIO().isMuted()
       ? kt("soundOff")
       : kt("soundOn");
-    button.setAttribute("aria-pressed", String(!window.KidsAudio.isMuted()));
+    button.setAttribute("aria-pressed", String(!AUDIO().isMuted()));
     button.setAttribute("aria-label", kt("soundLabel"));
   };
   button.addEventListener("click", async () => {
-    await window.KidsAudio.ensure();
-    window.KidsAudio.setMuted(!window.KidsAudio.isMuted());
+    await AUDIO().ensure();
+    AUDIO().setMuted(!AUDIO().isMuted());
     tap();
     render();
   });
-  window.KidsI18n.onChange(render);
+  I18N().onChange(render);
   render();
   return button;
 }
@@ -209,7 +210,7 @@ export function fallback(container, href) {
     a.textContent = kt("playClassic");
   };
   render();
-  window.KidsI18n?.onChange(render);
+  I18N()?.onChange(render);
   (container || document.body).appendChild(box);
   return box;
 }

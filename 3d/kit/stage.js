@@ -15,6 +15,7 @@ import { timed } from "./materials.js";
 import { Particles } from "./particles.js";
 import * as ui from "./ui.js";
 import { kt } from "./i18n.js";
+import { I18N, AUDIO } from "./shared.js";
 
 export const stages = [];
 if (typeof window !== "undefined") window.__kitStages = stages; // for e2e tests / debugging
@@ -67,7 +68,7 @@ export function createStage({
     return null;
   }
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   if (!sky && background) renderer.setClearColor(background, 1);
   const canvas = renderer.domElement;
   canvas.setAttribute("aria-hidden", "true");
@@ -243,7 +244,7 @@ export function createStage({
     setPointer(e);
     const moved = Math.hypot(e.clientX - pressAt.x, e.clientY - pressAt.y);
     if (moved < 24 && pick() === obj) {
-      window.KidsAudio?.ensure();
+      AUDIO()?.ensure();
       h.onTap?.(obj);
     }
   };
@@ -483,9 +484,9 @@ export function createStage({
             typeof label === "function" ? label() : label,
           );
         setLabel();
-        window.KidsI18n?.onChange(setLabel);
+        I18N()?.onChange(setLabel);
         b.addEventListener("click", () => {
-          window.KidsAudio?.ensure();
+          AUDIO()?.ensure();
           if (squish !== false) h.spring.kick(-6);
           onTap?.(obj);
         });

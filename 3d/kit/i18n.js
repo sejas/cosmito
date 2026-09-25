@@ -1,5 +1,6 @@
 // Texts owned by the kit itself (fallback screens, chips, toasts). Games keep
 // their own dictionaries; see 3d/README.md. Uses the shared KidsI18n.
+import { I18N } from "./shared.js";
 export const KIT_DICT = {
   en: {
     noWebglTitle: "Oops! No 3D here",
@@ -41,4 +42,4 @@ export const KIT_DICT = {
   },
 };
 
-export const kt = (key, ...args) => window.KidsI18n.t(KIT_DICT, key, ...args);
+export const kt = (key, ...args) => I18N().t(KIT_DICT, key, ...args);

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>3D kit demo · Pipo &amp; Friends</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../shared/base.css" />
+  <link rel="stylesheet" href="ui.css" />
+  <style>
+    body { background: linear-gradient(#bfe6ff, #ffe3f1) fixed; }
+    .demo { max-width: 1100px; margin: 0 auto; padding: 16px 16px 60px; }
+    .demo h1 { margin: 6px 0 2px; font-size: clamp(28px, 6vw, 42px); }
+    .demo h2 { margin: 30px 0 10px; font-size: 24px; }
+    .demo p.lead { margin: 0 0 12px; color: var(--ink-soft); }
+    .top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .top .kit-chip:first-child { margin-right: auto; }
+    .view { height: min(72vh, 620px); border-radius: 28px; overflow: hidden; box-shadow: var(--kit-shadow); position: relative; }
+    .view.small { height: min(62vh, 520px); }
+    .mood-tag { font-weight: 700; font-size: 14px; padding: 2px 10px; border-radius: 99px; background: rgba(255,255,255,.75); white-space: nowrap; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+    .controls label { display: inline-flex; gap: 8px; align-items: center; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+    .kit-card h3 { margin: 4px 0; font-size: 20px; }
+    .kit-card p { margin: 0; color: var(--ink-soft); }
+    .kit-card .big { font-size: 46px; }
+    code { background: rgba(255,255,255,.6); padding: 1px 6px; border-radius: 8px; }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "../../vendor/three/three.module.min.js", "three/addons/": "../../vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <main class="demo">
+    <div class="top">
+      <a class="kit-chip" href="../index.html" data-i18n="back"></a>
+      <span class="kit-chip" id="fps" aria-live="off">– fps</span>
+      <button class="kit-chip" id="btnBuddy" type="button"></button>
+      <button class="kit-chip" id="btnLang" type="button"></button>
+      <button class="kit-chip" id="btnSound" type="button"></button>
+    </div>
+    <h1 data-i18n="title"></h1>
+    <p class="lead" data-i18n="lead"></p>
+
+    <h2 data-i18n="moods"></h2>
+    <div class="view" id="moods"></div>
+
+    <h2 data-i18n="play"></h2>
+    <div class="view small" id="play"></div>
+    <div class="controls" id="moodBtns"></div>
+    <div class="controls">
+      <button class="kit-btn primary" id="btnCelebrate" type="button" data-i18n="celebrate"></button>
+      <button class="kit-btn" id="btnSay" type="button" data-i18n="sayHi"></button>
+      <button class="kit-btn" id="btnShake" type="button" data-i18n="shake"></button>
+      <button class="kit-btn" id="btnConfetti" type="button" data-i18n="confetti"></button>
+      <label><span data-i18n="mouth"></span> <input type="range" id="mouth" min="0" max="1" step="0.01" value="0" /></label>
+      <label><input type="checkbox" id="follow" checked /> <span data-i18n="follow"></span></label>
+    </div>
+
+    <h2 data-i18n="glass"></h2>
+    <div class="grid">
+      <div class="kit-glass kit-card kit-holo-edge" data-tilt>
+        <div class="big">🪟</div>
+        <h3 data-i18n="panelTitle"></h3>
+        <p data-i18n="panelBody"></p>
+      </div>
+      <div class="kit-glass kit-card" data-tilt>
+        <h3 data-i18n="progress"></h3>
+        <div id="barHost" style="margin: 12px 0 8px"></div>
+        <span class="kit-badge" data-i18n="badge"></span>
+      </div>
+      <div class="kit-glass kit-card">
+        <h3 data-i18n="buttons"></h3>
+        <div class="controls">
+          <button class="kit-btn primary" type="button" id="btnDialog" data-i18n="dialog"></button>
+          <button class="kit-btn" type="button" id="btnToast" data-i18n="toast"></button>
+          <button class="kit-btn kit-round" type="button" aria-label="Star">⭐</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../shared/storage.js"></script>
+  <script src="../../shared/i18n.js"></script>
+  <script src="../../shared/audio.js"></script>
+  <script src="../../shared/fx.js"></script>
+  <script src="../../shared/mascot.js"></script>
+  <script src="../../shared/mascots/pipo.js"></script>
+  <script src="../../shared/mascots/bollo.js"></script>
+  <script type="module" src="demo.js"></script>
+</body>
+</html>
