@@ -272,7 +272,7 @@ export function createMap(stage, { worlds, levels, t, onStone, onIsland }) {
         if (z > lay.rz * 0.35 && Math.abs(x) < lay.rx * 0.7) continue; // keep the front open
         if (
           mine.some(
-            (s) => Math.hypot(s.g.position.x - x, s.g.position.z - z) < 1.05,
+            (s) => Math.hypot(s.g.position.x - x, s.g.position.z - z) < 1.35,
           )
         )
           continue;

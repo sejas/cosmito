@@ -544,7 +544,7 @@ function start() {
       if (L === lvl && mode === "play" && !runState) {
         buddy.setMood("hop", 700);
         say(
-          tip || pick(t("hello", buddyName(), treatName())),
+          tip || pick(t("hello", buddyName(), treatName()).filter((_, k) => k !== 1)), // not "pick a level"
           tip ? 5000 : 3000,
         );
       }
