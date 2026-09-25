@@ -31,6 +31,7 @@ export {
   ellipsePoints,
 } from "./view.js";
 export { clampPin, isShown } from "./screen.js";
+export { TreatInstances, treatParts } from "./instanced.js";
 export { LEVELS, settingsFor } from "./quality.js";
 export { KIT_DICT, kt } from "./i18n.js";
 export * as ui from "./ui.js";

@@ -2,7 +2,6 @@
 // empties as time runs out, and treats raining from the sky.
 import * as THREE from "three";
 import * as Kit from "../../kit/kit.js";
-import { TreatInstances } from "./instanced.js";
 
 const BEADS = 60;
 
@@ -107,7 +106,7 @@ export function createTimerRing(stage) {
 
 // Treats falling from the sky, spinning. Ambient drizzle + bursts.
 export function createRain(stage, { max = 28 } = {}) {
-  const inst = new TreatInstances(stage, max);
+  const inst = new Kit.TreatInstances(stage, max);
   const drops = [];
   let area = { x: 0, w: 10, top: 7, bottom: -3 };
   let rate = 0; // drops per second (0 = off)

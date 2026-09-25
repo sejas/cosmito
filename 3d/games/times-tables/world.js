@@ -2,7 +2,6 @@
 // the treat jar and the streak fire ring.
 import * as THREE from "three";
 import * as Kit from "../../kit/kit.js";
-import { TreatInstances } from "./instanced.js";
 import { jarSlot, JAR_CAPACITY } from "./logic.js";
 
 // Pop an object's scale from 0 (or `from`) to `to` with a springy ease.
@@ -184,7 +183,7 @@ export function createJar(stage) {
   shine.position.set(-0.36, 0.95, 0.44);
   shine.rotation.z = 0.05;
   shine.renderOrder = 3;
-  const treats = new TreatInstances(stage, JAR_CAPACITY);
+  const treats = new Kit.TreatInstances(stage, JAR_CAPACITY);
   body.add(bottom, treats.group, glass, lip, shine);
   const shadow = Kit.blobShadow(0.9);
   root.add(shadow);
