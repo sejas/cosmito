@@ -48,6 +48,19 @@ vendor/three/         three.js, kept in the repo (MIT), so no CDN is needed
 
 `3d/` is a three.js version of the collection: a floating-island hub where each game is a portal, and toy-like 3D versions of the mascots. It shares progress, language and buddy with the classic games, and falls back to them on devices without WebGL2. See [3d/README.md](3d/README.md) to build a 3D game.
 
+## Lessons learned
+
+This project was built mostly by AI coding agents working in parallel, with a human choosing direction. What worked, and what we'd do again:
+
+- **Design for the youngest player.** Big targets, few words, voice and icons, and mistakes that teach instead of punish. Kids who can't read yet rely on the voice, so voice quality matters.
+- **One shared layer, many small games.** Language, storage, sound, effects and mascots are shared, so every new game gets two languages, any buddy and saved progress for free.
+- **Mascots are data, not hard-coded characters.** Each mascot brings its name, sound and favourite treat, so "play times tables with the guinea pig and collect peppers" needs no extra code.
+- **Keep game rules in plain, tested logic.** The 3D edition reuses the 2D rules unchanged, so both versions stay identical and share progress.
+- **Test what content promises,** such as every puzzle being solvable and every phrase being correct in both languages, and look at screenshots at phone size.
+- **Check names before you publish.** Look for trademarks and slang in every variant of each language.
+
+The details are in [AGENTS.md](AGENTS.md).
+
 ## Contributing
 
 New games, languages and mascots are very welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
