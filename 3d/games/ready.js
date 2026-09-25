@@ -15,4 +15,6 @@ export const READY_3D = [
   // "words",
   //
   // "clock",
+  //
+  "cube",
 ];
