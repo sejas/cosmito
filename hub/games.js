@@ -94,6 +94,20 @@ const GAMES = [
     },
     skills: { en: "Time · Clocks", es: "La hora · Relojes" },
   },
+  {
+    id: "cube",
+    href: "3d/games/cube/",
+    emoji: "🧊",
+    mascot: "pipo",
+    color: "#4dabf7",
+    maxStars: 30,
+    title: { en: (name) => `Cube with ${name}`, es: (name) => `Cubo con ${name}` },
+    about: {
+      en: (name) => `Twist the puzzle cube and learn to solve it, step by step, with ${name}!`,
+      es: (name) => `¡Gira el cubo de colores y aprende a resolverlo paso a paso con ${name}!`,
+    },
+    skills: { en: "Logic · Spatial thinking", es: "Lógica · Visión espacial" },
+  },
 ];
 
 // Ranks for the stars collected across all games. Shared by both hubs (the 2D
