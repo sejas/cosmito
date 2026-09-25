@@ -1,0 +1,67 @@
+/* 3D hub layout: HUD glass over a full-screen island world. */
+body { background: linear-gradient(#6fb8ff, #bfe6ff 55%, #ffe3f1); min-height: 100dvh; }
+html.has-3d, html.has-3d body { overflow: hidden; height: 100%; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.world.kit-stage { position: fixed; inset: 0; width: auto; height: auto; z-index: 0; }
+
+.hub3d-head {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10; pointer-events: none;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: max(12px, env(safe-area-inset-top)) 16px 0;
+}
+.hub3d-head > * { pointer-events: auto; }
+.hub3d-logo {
+  margin: 0; padding: 6px 16px 6px 18px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px;
+  font-size: clamp(20px, 4.4vw, 30px); font-weight: 700; letter-spacing: 0.3px; white-space: nowrap;
+}
+.hub3d-logo .kit-badge { font-size: 0.55em; padding: 3px 10px; }
+.hub3d-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; justify-content: flex-end; }
+
+/* Portal labels: real buttons pinned under each portal. */
+.portal-label {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+  width: max-content; max-width: min(190px, 44vw); padding: 8px 14px 9px; border-radius: 20px;
+  font: inherit; color: var(--ink); text-align: center; line-height: 1.15;
+  border-color: color-mix(in srgb, var(--c) 55%, #fff);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--c) 35%, transparent), var(--kit-inner);
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.portal-label:hover, .portal-label:focus-visible { background: var(--kit-glass-strong); }
+.portal-label:active { scale: 0.94; }
+.pl-title { font-weight: 700; font-size: 16px; }
+.pl-meta { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.pl-badge { font-size: 11px; padding: 2px 8px; }
+.pl-badge.soon { background: rgba(38, 49, 92, 0.1); color: var(--ink-soft); box-shadow: none; }
+
+.trophy3d {
+  position: fixed; z-index: 10; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+  width: min(520px, calc(100vw - 32px)); display: flex; align-items: center; gap: 12px; padding: 10px 18px 12px;
+}
+.trophy3d-icon { font-size: 38px; filter: drop-shadow(0 4px 6px rgba(240, 165, 0, 0.35)); }
+.trophy3d-body { flex: 1; min-width: 0; }
+.trophy3d-row { display: flex; justify-content: space-between; gap: 8px; font-size: 17px; margin-bottom: 6px; }
+.trophy3d-row strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trophy3d-row span { font-weight: 600; white-space: nowrap; }
+.trophy3d-next { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+
+@media (max-width: 600px) {
+  .hub3d-head { gap: 8px; }
+  .hub3d-chips { gap: 6px; }
+  .hub3d-chips .kit-chip { min-height: 40px; padding: 6px 12px; font-size: 14px; }
+  .pl-title { font-size: 13px; }
+  .portal-label { padding: 5px 8px 6px; max-width: 40vw; border-radius: 16px; }
+  .pl-meta { flex-direction: column; gap: 2px; font-size: 12px; }
+  .trophy3d { padding: 8px 14px 10px; }
+  .trophy3d-icon { font-size: 30px; }
+  .trophy3d-row { font-size: 15px; }
+  .trophy3d-next { display: none; }
+}
+
+@media (max-width: 420px) {
+  .hub3d-chips { margin-left: 0; width: 100%; justify-content: center; }
+  .hub3d-chips .kit-chip { min-height: 38px; padding: 5px 9px; font-size: 13px; gap: 3px; }
+}
+
+/* Without WebGL the fallback card explains and links to the classic hub. */
+.kit-no3d .portal-list, .kit-no3d .trophy3d { display: none; }
