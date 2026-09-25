@@ -6,7 +6,7 @@
 export const READY_3D = [
   // "sing",
   //
-  // "times-tables",
+  "times-tables",
   //
   // "code",
   //

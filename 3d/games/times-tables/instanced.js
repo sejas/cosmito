@@ -47,10 +47,46 @@ function bakeInstanced(im, stride = 2, grow = 1.25) {
   return g;
 }
 
+// A lighter stand-in for a heavy, roughly round part (e.g. the pepper body,
+// ~1700 triangles): a low-res sphere whose vertices snap to the original
+// vertex lying in the same direction from the centre. Fine at array sizes.
+function lowPoly(geo, segW = 18, segH = 12) {
+  geo.computeBoundingBox();
+  const c = geo.boundingBox.getCenter(new THREE.Vector3());
+  const src = geo.attributes.position;
+  const dirs = [];
+  const pts = [];
+  for (let i = 0; i < src.count; i++) {
+    const p = new THREE.Vector3().fromBufferAttribute(src, i);
+    pts.push(p);
+    dirs.push(p.clone().sub(c).normalize());
+  }
+  const out = new THREE.SphereGeometry(1, segW, segH);
+  const pos = out.attributes.position;
+  const d = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    d.fromBufferAttribute(pos, i).normalize();
+    let best = 0;
+    let bestDot = -2;
+    for (let k = 0; k < dirs.length; k++) {
+      const dot = dirs[k].dot(d);
+      if (dot > bestDot) {
+        bestDot = dot;
+        best = k;
+      }
+    }
+    pos.setXYZ(i, pts[best].x, pts[best].y, pts[best].z);
+  }
+  out.computeVertexNormals();
+  return out;
+}
+const triCount = (g) => (g.index ? g.index.count : g.attributes.position.count) / 3;
+
 // Split a treat into parts: [{ geometry, material, locals: [Matrix4] }]
 const partsCache = new Map();
-export function treatParts(id) {
-  if (partsCache.has(id)) return partsCache.get(id);
+export function treatParts(id, { light = false } = {}) {
+  const ck = `${id}|${light}`;
+  if (partsCache.has(ck)) return partsCache.get(ck);
   const proto = Kit.treat(id);
   proto.updateMatrixWorld(true);
   const byKey = new Map();
@@ -62,13 +98,16 @@ export function treatParts(id) {
     if (o.isInstancedMesh) {
       geometry = bakeInstanced(o);
       key = `baked|${o.uuid}`;
+    } else if (light && triCount(geometry) > 900) {
+      geometry = lowPoly(geometry);
+      key = `low|${key}`;
     }
     if (!byKey.has(key))
       byKey.set(key, { geometry, material: o.material, locals: [] });
     byKey.get(key).locals.push(local);
   });
   const parts = [...byKey.values()];
-  partsCache.set(id, parts);
+  partsCache.set(ck, parts);
   return parts;
 }
 
@@ -99,7 +138,7 @@ export class TreatInstances {
       this.group.remove(m);
       m.dispose();
     }
-    this.meshes = treatParts(id).map((part) => {
+    this.meshes = treatParts(id, { light: this.max >= 60 }).map((part) => {
       const m = new THREE.InstancedMesh(
         part.geometry,
         part.material,
