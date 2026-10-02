@@ -27,6 +27,18 @@ Any static host works (GitHub Pages, Netlify, …). The singing game needs **HTT
 
 Handy for testing: `games/sing/?fake=1` replaces the microphone with a simulated singer.
 
+## Live site
+
+Hosted on [Spacefast](https://spacefast.com/) at **https://cosmito.view.fast/**. Access is private by default, so visitors need a Spacefast grant or the space set to public.
+
+To publish a new version, export a clean copy (no `.git`) and publish it:
+
+```sh
+rm -rf /tmp/cosmito && mkdir /tmp/cosmito && git archive main | tar -x -C /tmp/cosmito
+node tools/stamp-versions.mjs /tmp/cosmito "$(git rev-parse --short HEAD)"   # cache-bust .js/.css
+npx -y spacefast@latest publish /tmp/cosmito --space cosmito --wait
+```
+
 ## Project layout
 
 ```

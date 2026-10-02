@@ -60,6 +60,7 @@ a.game-card:active { transform: translateY(2px); }
 .soon .game-top { background: none; }
 
 .hub-foot { text-align: center; margin-top: 36px; color: var(--ink-soft); font-weight: 500; }
+.hub-source { display: block; margin-top: 6px; color: inherit; }
 
 @media (max-width: 600px) {
   .friends-row { margin-top: 64px; }
